@@ -14,7 +14,7 @@ point *path;
 
 int pointsNum = 0;
 
-void start_element(void *data, const char *element, const char **attribute) {
+void start_element (void *data, const char *element, const char **attribute) {
     if(!strcmp(element, "trkpt")) {
         path = realloc(path, (pointsNum + 1) * sizeof(point));
         path[pointsNum].lat = atofCoord(attribute[1]);
@@ -24,13 +24,13 @@ void start_element(void *data, const char *element, const char **attribute) {
     depth++;
 }
 
-void end_element(void *data, const char *el) {
+void end_element (void *data, const char *el) {
     depth--;
 }
 
-int xmlParse(GtkWidget *widget, GtkWidget *fileName) {
+int xmlParse (const char *fileName) {
     FILE *fp;
-    if ((fp = fopen(gtk_entry_get_text(GTK_ENTRY(fileName)), "r")) == NULL) {
+    if ((fp = fopen(fileName, "r")) == NULL) {
         fileOpenError();
         return 1;
     }
@@ -43,13 +43,24 @@ int xmlParse(GtkWidget *widget, GtkWidget *fileName) {
 
     fread(buff, sizeof(char), BUFF_SIZE, fp);
 
-    if(XML_Parse(parser, buff, strlen(buff), XML_TRUE) == XML_STATUS_ERROR) {
-        printf("Error: %s\n", XML_ErrorString(XML_GetErrorCode(parser)));
-    }
+    XML_Parse(parser, buff, strlen(buff), XML_TRUE);
 
     fclose(fp);
     free(buff);
     XML_ParserFree(parser);
-
     return 0;
+}
+
+double fullDistancePass (point *path, int pointsNum) {
+    double fullDist = 0;
+    for(int i = 1 ; i < pointsNum ; i++) {
+        fullDist += singleDistance(path[i - 1], path[i]);
+    }
+    return fullDist;
+}
+
+double fullDistance () {
+    double dist = fullDistancePass(path, pointsNum);
+    pointsNum = 0;
+    return dist;
 }
