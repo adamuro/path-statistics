@@ -51,14 +51,6 @@ int xmlParse (const char *fileName) {
     return 0;
 }
 
-double fullDistancePass (point *path, int pointsNum) {
-    double fullDist = 0;
-    for(int i = 1 ; i < pointsNum ; i++) {
-        fullDist += singleDistance(path[i - 1], path[i]);
-    }
-    return fullDist;
-}
-
 double fullDistance () {
     double dist = fullDistancePass(path, pointsNum);
     pointsNum = 0;

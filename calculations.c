@@ -26,6 +26,13 @@ double singleDistance (point point1, point point2) {
     double dist = 6371.0 * acos(sin(point1.lon / 180.0 * M_PI) * sin(point2.lon / 180.0 * M_PI) +
         cos(point1.lon / 180.0 * M_PI) * cos(point2.lon / 180.0 * M_PI) *
         cos(point2.lat / 180.0 * M_PI - point1.lat / 180.0 * M_PI));
-    printf("%lf\n", dist);
     return dist;
+}
+
+double fullDistancePass (point *path, int pointsNum) {
+    double fullDist = 0;
+    for(int i = 1 ; i < pointsNum ; i++) {
+        fullDist += singleDistance(path[i - 1], path[i]);
+    }
+    return fullDist;
 }
