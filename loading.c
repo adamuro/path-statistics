@@ -28,6 +28,14 @@ void end_element (void *data, const char *el) {
     depth--;
 }
 
+void handler(void *data, const char *object, int len) {
+    if(len == 9 || len == 20) {
+        for(int i = 0 ; i < len - 1 ; i++)
+            putchar(object[i]);
+        putchar('\n');
+    }
+}
+
 int xmlParse (const char *fileName) {
     FILE *fp;
     if ((fp = fopen(fileName, "r")) == NULL) {
@@ -40,6 +48,7 @@ int xmlParse (const char *fileName) {
 
     XML_Parser parser = XML_ParserCreate(NULL);
     XML_SetElementHandler(parser, start_element, end_element);
+    XML_SetCharacterDataHandler(parser, handler);
 
     fread(buff, sizeof(char), BUFF_SIZE, fp);
 
