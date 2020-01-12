@@ -9,7 +9,6 @@ typedef struct date {
 typedef struct point {
     double lat;
     double lon;
-    double height;
     date pDate;
 } point;
 

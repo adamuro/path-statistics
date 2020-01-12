@@ -6,6 +6,6 @@ double atofCoord (const char *str);
 
 double singleDistance (point point1, point point2);
 
-double fullDistancePass (point *path, int pointsNum);
+double fullDistance (point *path, int pointsNum);
 
 #endif
