@@ -6,10 +6,20 @@ typedef struct date {
     unsigned short hour, minute, second;
 } date;
 
-typedef struct point {
+typedef struct Pt {
     double lat;
     double lon;
-    date pDate;
-} point;
+} Pt;
+
+typedef struct PtList {
+	int pointsNum;
+	Pt *point;
+
+	int dateNum;
+	date *pDate;
+
+	int hNum;
+	double *height;
+} PtList;
 
 #endif

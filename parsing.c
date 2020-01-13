@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <expat.h>
 #include <gtk/gtk.h>
+#include <limits.h>
 #include "structures.h"
 #include "display.h"
 #include "calculations.h"
@@ -10,17 +11,27 @@
 
 static int depth = 0;
 
-point *path;
-int pointsNum = 0;
-double maxHeight = 0;
-double minHeight = 999999;
+PtList *path;
+
+void pathInit () {
+    path = calloc(1, sizeof(PtList));
+}
+
+void pathFree () {
+    path -> pointsNum = 0;
+    free(path -> point);
+    path -> dateNum = 0;
+    free(path -> pDate);
+    path -> hNum = 0;
+    free(path -> height);
+}
 
 void start_element (void *data, const char *element, const char **attribute) {
     if(!strcmp(element, "trkpt")) {
-        path = realloc(path, (pointsNum + 1) * sizeof(point));
-        path[pointsNum].lat = atofCoord(attribute[1]);
-        path[pointsNum].lon = atofCoord(attribute[3]);
-        pointsNum++;
+        path -> point = realloc(path -> point, (path -> pointsNum + 1) * sizeof(Pt));
+        path -> point[path -> pointsNum].lat = atofCoord(attribute[1]);
+        path -> point[path -> pointsNum].lon = atofCoord(attribute[3]);
+        path -> pointsNum++;
     }
     depth++;
 }
@@ -30,19 +41,25 @@ void end_element (void *data, const char *el) {
 }
 
 void handler(void *data, const char *object, int len) {
-    //if() {
-    // WCZYTYWANIE DATY
-    //}
-    char ele[3];
-    strncpy(ele, object + len + 2, 3);
-    if(!strcmp(ele, "ele")) {
-        char h [len - 3];
-        strncpy(h, object, len - 3);
-        double height = atofCoord(h);
-        if(height > maxHeight)
-            maxHeight = height;
-        else if(height < minHeight)
-            minHeight = height;
+    if(depth == 5) {
+        if(object[len + 2] == 't') {
+            char dateCheck[4];
+            strncpy(dateCheck, object + len + 2, 4);
+            if(!strcmp(dateCheck, "time")) {
+                char dateStr [len - 1];
+                strncpy(dateStr, object, len - 1);
+                path -> pDate = realloc(path -> pDate, (path -> dateNum + 1) * sizeof(date));
+                getDate(path -> pDate[path -> dateNum], dateStr);
+                path -> dateNum++;
+            }
+        }
+        else if(object[len + 2] == 'e'){
+            char heightStr [len - 3];
+            strncpy(heightStr, object, len - 3);
+            path -> height = realloc(path -> height, (path -> hNum + 1) * sizeof(double));
+            path -> height[path -> hNum] = atofCoord(heightStr);
+            path -> hNum++;
+        }
     }
 }
 
@@ -53,7 +70,7 @@ int xmlParse (const char *fileName) {
         return 1;
     }
     char *buff = malloc(BUFF_SIZE);
-    path = calloc(1, sizeof(point));
+    pathInit();
 
     XML_Parser parser = XML_ParserCreate(NULL);
     XML_SetElementHandler(parser, start_element, end_element);
@@ -70,23 +87,17 @@ int xmlParse (const char *fileName) {
 }
 
 double fullDistancePass () {
-    double dist = fullDistance(path, pointsNum);
-    pointsNum = 0;
-    return dist;
+    return fullDistance(path);
 }
 
 double minHeightPass () {
-    return minHeight;
+    return minHeight(path);
 }
 
 double maxHeightPass () {
-    return maxHeight;
+    return maxHeight(path);
 }
 
 double heightDif () {
-    double minH = minHeight;
-    double maxH = maxHeight;
-    minHeight = 999999;
-    maxHeight = 0;
-    return maxH - minH;
+    return maxHeight(path) - minHeight(path);
 }

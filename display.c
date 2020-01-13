@@ -32,6 +32,7 @@ char* makeLabelName (char *type) {
    }
    return fullName;
 }
+
 /* OKNO ZE STATYSTYKAMI */
 void statsWindow (GtkWidget *widget, GtkWidget *entry) {
    if(!xmlParse(gtk_entry_get_text(GTK_ENTRY(entry)))) {
@@ -74,6 +75,8 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
    g_signal_connect(statsWindow, "destroy", G_CALLBACK(gtk_widget_destroy), statsWindow);
 
    gtk_widget_show_all(statsWindow);
+
+   pathFree();
 }}
 /* OKNO POMOCY */
 void helpWindow () {
