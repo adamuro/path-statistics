@@ -2,18 +2,20 @@
 #ifndef CALCULATIONS_H
 #define CALCULATIONS_H
 
-char* copyStrPart (char *str, int from, int to);
-
-double atofCoord (const char *str);
-
-void getDate(date pDate, char *dateStr);
+double atofC (const char *str);
 
 double singleDistance (Pt p1, Pt p2);
 
-double fullDistance (PtList *path);
+double fullDistance ();
 
-double minHeight (PtList *path);
+double minHeight ();
 
-double maxHeight (PtList *path);
+double maxHeight ();
+
+double heightDif ();
+
+void getDate (PtDate *date, int dateNum, char *dateStr);
+
+long long pathDuration ();
 
 #endif

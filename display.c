@@ -2,25 +2,61 @@
 #include <string.h>
 #include "parsing.h"
 #include "calculations.h"
-
+/*
+ *  TWORZENIE INFORMACJI O DANEJ STATYSTYCE
+ */
 char* makeLabelName (char *type) {
    char nameBase[16];
    static char fullName[32];
-   if(!strcmp(type, "dist")) {
+   if(!strcmp(type, "date")) {
+      strcpy(fullName, "Data: ");
+      g_snprintf(nameBase, 17, "%d", path -> date[0].day);
+      if(path -> date[0].day < 10)
+         strcat(fullName, "0");
+      strcat(fullName, nameBase);
+      strcat(fullName, ".");
+      g_snprintf(nameBase, 17, "%d", path -> date[0].month);
+      if(path -> date[0].month < 10)
+         strcat(fullName, "0");
+      strcat(fullName, nameBase);
+      strcat(fullName, ".");
+      g_snprintf(nameBase, 17, "%d", path -> date[0].year);
+      strcat(fullName, nameBase);
+   }
+   else if(!strcmp(type, "time")) {
+      strcpy(fullName, "Czas: ");
+      if(pathDuration() / 3600 > 0) {
+         if(pathDuration() / 3600 < 10)
+            strcat(fullName, "0");
+         g_snprintf(nameBase, 17, "%lld", pathDuration() / 3600);
+         strcat(fullName, nameBase);
+         strcat(fullName, ":");
+      }
+      if((pathDuration() % 3600) / 60 < 10)
+            strcat(fullName, "0");
+         g_snprintf(nameBase, 17, "%lld", (pathDuration() % 3600) / 60);
+         strcat(fullName, nameBase);
+         strcat(fullName, ":");
+      if(pathDuration() % 60 < 10)
+            strcpy(fullName, "0");
+         g_snprintf(nameBase, 17, "%lld", pathDuration() % 60);
+         strcat(fullName, nameBase);
+   }
+   else if(!strcmp(type, "dist")) {
       strcpy(fullName, "Dlugosc trasy: ");
-      g_snprintf(nameBase, 17, "%.2lf", fullDistancePass());
+      g_snprintf(nameBase, 17, "%.2lf", fullDistance());
       strcat(fullName, nameBase);
       strcat(fullName, " km");
    }
    else if(!strcmp(type, "minH")) {
       strcpy(fullName, "Najnizszy punkt: ");
-      g_snprintf(nameBase, 16, "%.2lf", minHeightPass());
+      g_snprintf(nameBase, 16, "%.2lf", minHeight());
       strcat(fullName, nameBase);
       strcat(fullName, " m");
    }
    else if(!strcmp(type, "maxH")) {
       strcpy(fullName, "Najwyzszy punkt: ");
-      g_snprintf(nameBase, 16, "%.2lf", maxHeightPass());
+      g_snprintf(nameBase, 16, "%.2lf", maxHeight());
       strcat(fullName, nameBase);
       strcat(fullName, " m");
    }
@@ -33,11 +69,15 @@ char* makeLabelName (char *type) {
    return fullName;
 }
 
-/* OKNO ZE STATYSTYKAMI */
+/*
+ *  OKNO ZE STATYSTYKAMI
+ */
 void statsWindow (GtkWidget *widget, GtkWidget *entry) {
-   if(!xmlParse(gtk_entry_get_text(GTK_ENTRY(entry)))) {
+   if(!pathParse(gtk_entry_get_text(GTK_ENTRY(entry)))) {
    GtkWidget *statsWindow;
    GtkWidget *mainBox;
+   GtkWidget *dateText;
+   GtkWidget *timeText;
    GtkWidget *distanceText;
    GtkWidget *minHText;
    GtkWidget *maxHText;
@@ -52,6 +92,12 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
 
    mainBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
    gtk_container_add(GTK_CONTAINER(statsWindow), mainBox);
+   /* DATA */
+   dateText = gtk_label_new(makeLabelName("date"));
+   gtk_box_pack_start(GTK_BOX(mainBox), dateText, TRUE, TRUE, 0);
+   /* CZAS */
+   timeText = gtk_label_new(makeLabelName("time"));
+   gtk_box_pack_start(GTK_BOX(mainBox), timeText, TRUE, TRUE, 0);
    /* ŁĄCZNY DYSTANS */
    distanceText = gtk_label_new(makeLabelName("dist"));
    gtk_box_pack_start(GTK_BOX(mainBox), distanceText, TRUE, TRUE, 0);
@@ -78,7 +124,9 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
 
    pathFree();
 }}
-/* OKNO POMOCY */
+/*
+ *  OKNO POMOCY
+ */
 void helpWindow () {
    GtkWidget *helpWindow;
    GtkWidget *mainBox;
@@ -112,7 +160,9 @@ void setEntry (GtkWidget *widget, GtkWidget *entry) {
    gtk_editable_select_region(GTK_EDITABLE(entry), 0, gtk_entry_get_text_length(GTK_ENTRY(entry)));
    gtk_widget_grab_focus(entry);
 }
-/* MENU GLOWNE */
+/*
+ *  MENU GŁÓWNE
+ */
 void mainMenu () {
    static GtkWidget *entry;
    GtkWidget *mainMenu;
@@ -162,7 +212,9 @@ void mainMenu () {
 
    gtk_widget_show_all(mainMenu);
 }
-/* INFORMACJA O NIEODNALEZIENIU PODANEGO PLIKU */
+/*
+ *  INFORMACJA O NIEODNALEZIENIU DANEGO PLIKU
+ */
 void fileOpenError () {
    GtkWidget *errorWindow;
    GtkWidget *mainBox;

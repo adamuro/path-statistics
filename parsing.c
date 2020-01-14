@@ -3,16 +3,16 @@
 #include <stdlib.h>
 #include <expat.h>
 #include <gtk/gtk.h>
-#include <limits.h>
+#include <stdbool.h>
 #include "structures.h"
 #include "display.h"
 #include "calculations.h"
 #define BUFF_SIZE 500000
 
 static int depth = 0;
-
-PtList *path;
-
+/*
+ *  ALOKOWANIE PAMIĘCI
+ */
 void pathInit () {
     path = calloc(1, sizeof(PtList));
 }
@@ -21,16 +21,18 @@ void pathFree () {
     path -> pointsNum = 0;
     free(path -> point);
     path -> dateNum = 0;
-    free(path -> pDate);
+    free(path -> date);
     path -> hNum = 0;
     free(path -> height);
 }
-
+/*
+ *  PARSOWANIE
+ */
 void start_element (void *data, const char *element, const char **attribute) {
     if(!strcmp(element, "trkpt")) {
         path -> point = realloc(path -> point, (path -> pointsNum + 1) * sizeof(Pt));
-        path -> point[path -> pointsNum].lat = atofCoord(attribute[1]);
-        path -> point[path -> pointsNum].lon = atofCoord(attribute[3]);
+        path -> point[path -> pointsNum].lat = atofC(attribute[1]);
+        path -> point[path -> pointsNum].lon = atofC(attribute[3]);
         path -> pointsNum++;
     }
     depth++;
@@ -46,10 +48,10 @@ void handler(void *data, const char *object, int len) {
             char dateCheck[4];
             strncpy(dateCheck, object + len + 2, 4);
             if(!strcmp(dateCheck, "time")) {
-                char dateStr [len - 1];
-                strncpy(dateStr, object, len - 1);
-                path -> pDate = realloc(path -> pDate, (path -> dateNum + 1) * sizeof(date));
-                getDate(path -> pDate[path -> dateNum], dateStr);
+                char dateStr [len];
+                strncpy(dateStr, object, len);
+                path -> date = realloc(path -> date, (path -> dateNum + 1) * sizeof(PtDate));
+                getDate(path -> date, path -> dateNum, dateStr);
                 path -> dateNum++;
             }
         }
@@ -57,13 +59,13 @@ void handler(void *data, const char *object, int len) {
             char heightStr [len - 3];
             strncpy(heightStr, object, len - 3);
             path -> height = realloc(path -> height, (path -> hNum + 1) * sizeof(double));
-            path -> height[path -> hNum] = atofCoord(heightStr);
+            path -> height[path -> hNum] = atofC(heightStr);
             path -> hNum++;
         }
     }
 }
 
-int xmlParse (const char *fileName) {
+bool pathParse (const char *fileName) {
     FILE *fp;
     if ((fp = fopen(fileName, "r")) == NULL) {
         fileOpenError();
@@ -84,20 +86,4 @@ int xmlParse (const char *fileName) {
     free(buff);
     XML_ParserFree(parser);
     return 0;
-}
-
-double fullDistancePass () {
-    return fullDistance(path);
-}
-
-double minHeightPass () {
-    return minHeight(path);
-}
-
-double maxHeightPass () {
-    return maxHeight(path);
-}
-
-double heightDif () {
-    return maxHeight(path) - minHeight(path);
 }

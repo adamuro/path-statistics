@@ -1,10 +1,10 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
-typedef struct date {
+typedef struct PtDate {
     unsigned short day, month, year;
     unsigned short hour, minute, second;
-} date;
+} PtDate;
 
 typedef struct Pt {
     double lat;
@@ -16,10 +16,12 @@ typedef struct PtList {
 	Pt *point;
 
 	int dateNum;
-	date *pDate;
+	PtDate *date;
 
 	int hNum;
 	double *height;
 } PtList;
+
+PtList *path;
 
 #endif
