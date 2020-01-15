@@ -33,20 +33,26 @@ char* makeLabelName (char *type) {
          strcat(fullName, ":");
       }
       if((pathDuration() % 3600) / 60 < 10)
-            strcat(fullName, "0");
-         g_snprintf(nameBase, 17, "%lld", (pathDuration() % 3600) / 60);
-         strcat(fullName, nameBase);
-         strcat(fullName, ":");
+         strcat(fullName, "0");
+      g_snprintf(nameBase, 17, "%lld", (pathDuration() % 3600) / 60);
+      strcat(fullName, nameBase);
+      strcat(fullName, ":");
       if(pathDuration() % 60 < 10)
-            strcpy(fullName, "0");
-         g_snprintf(nameBase, 17, "%lld", pathDuration() % 60);
-         strcat(fullName, nameBase);
+         strcpy(fullName, "0");
+      g_snprintf(nameBase, 17, "%lld", pathDuration() % 60);
+      strcat(fullName, nameBase);
    }
    else if(!strcmp(type, "dist")) {
       strcpy(fullName, "Dlugosc trasy: ");
       g_snprintf(nameBase, 17, "%.2lf", fullDistance());
       strcat(fullName, nameBase);
       strcat(fullName, " km");
+   }
+   else if(!strcmp(type, "avgV")) {
+      strcpy(fullName, "Srednia predkosc: ");
+      g_snprintf(nameBase, 16, "%.2lf", fullDistance() / ((double)pathDuration() / 3600));
+      strcat(fullName, nameBase);
+      strcat(fullName, " km/h");
    }
    else if(!strcmp(type, "minH")) {
       strcpy(fullName, "Najnizszy punkt: ");
@@ -79,6 +85,7 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
    GtkWidget *dateText;
    GtkWidget *timeText;
    GtkWidget *distanceText;
+   GtkWidget *avgSpeedText;
    GtkWidget *minHText;
    GtkWidget *maxHText;
    GtkWidget *difHText;
@@ -101,6 +108,9 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
    /* ŁĄCZNY DYSTANS */
    distanceText = gtk_label_new(makeLabelName("dist"));
    gtk_box_pack_start(GTK_BOX(mainBox), distanceText, TRUE, TRUE, 0);
+   /* ŚREDNIA PRĘDKOŚĆ */
+   avgSpeedText = gtk_label_new(makeLabelName("avgV"));
+   gtk_box_pack_start(GTK_BOX(mainBox), avgSpeedText, TRUE, TRUE, 0);
    /* NAJNIŻSZY PUNKT */
    minHText = gtk_label_new(makeLabelName("minH"));
    gtk_box_pack_start(GTK_BOX(mainBox), minHText, TRUE, TRUE, 0);
