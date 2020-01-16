@@ -1,7 +1,9 @@
 #include <gtk/gtk.h>
 #include <string.h>
+#include <cairo.h>
 #include "parsing.h"
 #include "calculations.h"
+#include "draw.h"
 /*
  *  TWORZENIE INFORMACJI O DANEJ STATYSTYCE
  */
@@ -82,6 +84,8 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
    if(!pathParse(gtk_entry_get_text(GTK_ENTRY(entry)))) {
    GtkWidget *statsWindow;
    GtkWidget *mainBox;
+   GtkWidget *statsBox;
+   GtkWidget *drawingArea;
    GtkWidget *dateText;
    GtkWidget *timeText;
    GtkWidget *distanceText;
@@ -89,42 +93,60 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
    GtkWidget *minHText;
    GtkWidget *maxHText;
    GtkWidget *difHText;
+   GtkWidget *buttonBox;
    GtkWidget *closeButton;
+   GtkWidget *drawButton;
 
    statsWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    gtk_window_set_title(GTK_WINDOW(statsWindow), "Statystyki");
-   gtk_window_set_default_size(GTK_WINDOW(statsWindow), 400, 280);
+   gtk_window_set_default_size(GTK_WINDOW(statsWindow), 900, 400);
    gtk_container_set_border_width(GTK_CONTAINER(statsWindow), 10);
    gtk_window_set_resizable(GTK_WINDOW(statsWindow), FALSE);
 
-   mainBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+   mainBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
    gtk_container_add(GTK_CONTAINER(statsWindow), mainBox);
+
+   statsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+   gtk_box_pack_start(GTK_BOX(mainBox), statsBox, FALSE, TRUE, 0);
+
+   drawingArea = gtk_drawing_area_new();
+   gtk_box_pack_start(GTK_BOX(mainBox), drawingArea, TRUE, TRUE, 0);
    /* DATA */
    dateText = gtk_label_new(makeLabelName("date"));
-   gtk_box_pack_start(GTK_BOX(mainBox), dateText, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(statsBox), dateText, TRUE, TRUE, 0);
    /* CZAS */
    timeText = gtk_label_new(makeLabelName("time"));
-   gtk_box_pack_start(GTK_BOX(mainBox), timeText, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(statsBox), timeText, TRUE, TRUE, 0);
    /* ŁĄCZNY DYSTANS */
    distanceText = gtk_label_new(makeLabelName("dist"));
-   gtk_box_pack_start(GTK_BOX(mainBox), distanceText, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(statsBox), distanceText, TRUE, TRUE, 0);
    /* ŚREDNIA PRĘDKOŚĆ */
    avgSpeedText = gtk_label_new(makeLabelName("avgV"));
-   gtk_box_pack_start(GTK_BOX(mainBox), avgSpeedText, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(statsBox), avgSpeedText, TRUE, TRUE, 0);
    /* NAJNIŻSZY PUNKT */
    minHText = gtk_label_new(makeLabelName("minH"));
-   gtk_box_pack_start(GTK_BOX(mainBox), minHText, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(statsBox), minHText, TRUE, TRUE, 0);
    /* NAJWYŻSZY PUNKT */
    maxHText = gtk_label_new(makeLabelName("maxH"));
-   gtk_box_pack_start(GTK_BOX(mainBox), maxHText, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(statsBox), maxHText, TRUE, TRUE, 0);
    /* ROZNICA WYSOKOSCI */
    difHText = gtk_label_new(makeLabelName("difH"));
-   gtk_box_pack_start(GTK_BOX(mainBox), difHText, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(statsBox), difHText, TRUE, TRUE, 0);
+
+   buttonBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+   gtk_box_set_homogeneous(GTK_BOX(buttonBox), TRUE);
+   gtk_widget_set_margin_start(buttonBox, 50);
+   gtk_widget_set_margin_end(buttonBox, 50);
+   gtk_box_pack_start(GTK_BOX(statsBox), buttonBox, FALSE, TRUE, 0);
    /* PRZYCISK ZAMKNIJ */
    closeButton = gtk_button_new_with_label("Zamknij");
-   gtk_widget_set_margin_start(closeButton, 150);
-   gtk_widget_set_margin_end(closeButton, 150);
-   gtk_box_pack_start(GTK_BOX(mainBox), closeButton, FALSE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(buttonBox), closeButton, FALSE, TRUE, 0);
+
+   drawButton = gtk_button_new_with_label("Pokaz mape");
+   gtk_box_pack_start(GTK_BOX(buttonBox), drawButton, FALSE, TRUE, 0);
+
+   g_signal_connect(G_OBJECT(drawingArea), "draw", G_CALLBACK(on_draw_event), NULL);
+   g_signal_connect_swapped(drawButton, "clicked", G_CALLBACK(clicked), statsWindow);
 
    g_signal_connect(closeButton, "clicked", G_CALLBACK(gtk_window_close), statsWindow);
 
