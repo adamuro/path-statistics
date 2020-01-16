@@ -99,7 +99,7 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
 
    statsWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    gtk_window_set_title(GTK_WINDOW(statsWindow), "Statystyki");
-   gtk_window_set_default_size(GTK_WINDOW(statsWindow), 900, 400);
+   gtk_window_set_default_size(GTK_WINDOW(statsWindow), 800, 400);
    gtk_container_set_border_width(GTK_CONTAINER(statsWindow), 10);
    gtk_window_set_resizable(GTK_WINDOW(statsWindow), FALSE);
 
@@ -146,7 +146,7 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
    gtk_box_pack_start(GTK_BOX(buttonBox), drawButton, FALSE, TRUE, 0);
 
    g_signal_connect(G_OBJECT(drawingArea), "draw", G_CALLBACK(on_draw_event), NULL);
-   g_signal_connect_swapped(drawButton, "clicked", G_CALLBACK(clicked), statsWindow);
+   g_signal_connect_swapped(drawButton, "clicked", G_CALLBACK(clicked), drawingArea);
 
    g_signal_connect(closeButton, "clicked", G_CALLBACK(gtk_window_close), statsWindow);
 
