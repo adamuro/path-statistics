@@ -80,8 +80,8 @@ char* makeLabelName (char *type) {
 /*
  *  OKNO ZE STATYSTYKAMI
  */
-void statsWindow (GtkWidget *widget, GtkWidget *entry) {
-   if(!pathParse(gtk_entry_get_text(GTK_ENTRY(entry)))) {
+void statsWindow (char *fileName) {
+   if(!pathParse(fileName)) {
    GtkWidget *statsWindow;
    GtkWidget *mainBox;
    GtkWidget *statsBox;
@@ -146,7 +146,7 @@ void statsWindow (GtkWidget *widget, GtkWidget *entry) {
    gtk_box_pack_start(GTK_BOX(buttonBox), drawButton, FALSE, TRUE, 0);
 
    g_signal_connect(G_OBJECT(drawingArea), "draw", G_CALLBACK(on_draw_event), NULL);
-   g_signal_connect_swapped(drawButton, "clicked", G_CALLBACK(clicked), drawingArea);
+   g_signal_connect_swapped(drawButton, "clicked", G_CALLBACK(clicked), statsWindow);
 
    g_signal_connect(closeButton, "clicked", G_CALLBACK(gtk_window_close), statsWindow);
 
@@ -192,17 +192,34 @@ void setEntry (GtkWidget *widget, GtkWidget *entry) {
    gtk_editable_select_region(GTK_EDITABLE(entry), 0, gtk_entry_get_text_length(GTK_ENTRY(entry)));
    gtk_widget_grab_focus(entry);
 }
+
+void fileSelection () {
+   GtkWidget *fileSelectionDialog;
+   fileSelectionDialog = gtk_file_chooser_dialog_new("Wybierz plik", NULL, 
+      GTK_FILE_CHOOSER_ACTION_OPEN, "Wybierz", GTK_RESPONSE_OK, 
+      "Anuluj", GTK_RESPONSE_CANCEL, NULL);
+   gtk_widget_show_all(fileSelectionDialog);
+   gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(fileSelectionDialog),
+      g_get_home_dir());
+   gint Respnse = gtk_dialog_run(GTK_DIALOG(fileSelectionDialog));
+   if(Respnse == GTK_RESPONSE_OK)
+      statsWindow((gpointer) gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(fileSelectionDialog)));
+   gtk_widget_destroy(fileSelectionDialog);
+}
+
 /*
  *  MENU GŁÓWNE
  */
 void mainMenu () {
-   static GtkWidget *entry;
    GtkWidget *mainMenu;
+   GtkWidget *mainBox;
+   GtkWidget *fileSelectionBox;
+   GtkWidget *entry;
+   GtkWidget *browseButton;
+   GtkWidget *buttonBox;
    GtkWidget *confirmButton;
    GtkWidget *exitButton;
    GtkWidget *helpButton;
-   GtkWidget *mainBox;
-   GtkWidget *hBox;
 
    mainMenu = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    gtk_window_set_title(GTK_WINDOW(mainMenu), "Testowy program");
@@ -216,25 +233,32 @@ void mainMenu () {
    gtk_widget_set_margin_end(mainBox, 70);
    gtk_widget_set_margin_top(mainBox, 70);
    gtk_widget_set_margin_bottom(mainBox,70);
+
+   fileSelectionBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+   gtk_box_pack_start(GTK_BOX(mainBox), fileSelectionBox, TRUE, TRUE, 0);
    /* WPROWADZANIE SCIEZKI DO PLIKU */
    entry = gtk_entry_new();
    gtk_entry_set_max_length(GTK_ENTRY(entry), 50);
    gtk_entry_set_text(GTK_ENTRY(entry), "Wprowadz tekst");
    gtk_editable_select_region(GTK_EDITABLE(entry), 0, gtk_entry_get_text_length(GTK_ENTRY(entry)));
-   gtk_box_pack_start(GTK_BOX(mainBox), entry, TRUE, TRUE, 0);
+   gtk_box_pack_start(GTK_BOX(fileSelectionBox), entry, TRUE, TRUE, 0);
 
-   hBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-   gtk_box_set_homogeneous(GTK_BOX(hBox), TRUE);
-   gtk_box_pack_start(GTK_BOX(mainBox), hBox, TRUE, TRUE, 0);
+   browseButton = gtk_button_new_with_label("...");
+   g_signal_connect(browseButton, "clicked", G_CALLBACK(fileSelection), NULL);
+   gtk_box_pack_start(GTK_BOX(fileSelectionBox), browseButton, TRUE, TRUE, 0);
+
+   buttonBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+   gtk_box_set_homogeneous(GTK_BOX(buttonBox), TRUE);
+   gtk_box_pack_start(GTK_BOX(mainBox), buttonBox, TRUE, TRUE, 0);
    /* PRZYCISK WYJSCIE */
    exitButton = gtk_button_new_with_label("Wyjscie");
    g_signal_connect(exitButton, "clicked", G_CALLBACK(gtk_main_quit), NULL);
-   gtk_box_pack_start(GTK_BOX(hBox), exitButton, TRUE, TRUE, 1);
+   gtk_box_pack_start(GTK_BOX(buttonBox), exitButton, TRUE, TRUE, 1);
    /* PRZYCISK POTWIERDZ */
    confirmButton = gtk_button_new_with_label("Potwierdz");
-   g_signal_connect(confirmButton, "clicked", G_CALLBACK(statsWindow), (gpointer) entry);
+   g_signal_connect_swapped(confirmButton, "clicked", G_CALLBACK(statsWindow), (gpointer) gtk_entry_get_text(GTK_ENTRY(entry)));
    g_signal_connect(confirmButton, "clicked", G_CALLBACK(setEntry), (gpointer) entry);
-   gtk_box_pack_start(GTK_BOX(hBox), confirmButton, TRUE, TRUE, 1);
+   gtk_box_pack_start(GTK_BOX(buttonBox), confirmButton, TRUE, TRUE, 1);
    /* PRZYCISK POMOC */
    helpButton = gtk_button_new_with_label("Pomoc");
    g_signal_connect(helpButton, "clicked", G_CALLBACK(helpWindow), NULL);
