@@ -1,39 +1,32 @@
 #include <cairo.h>
 #include <gtk/gtk.h>
+#include "structures.h"
+#include "parsing.h"
 
-struct {
-   int count;
-   double coordx[100];
-   double coordy[100];
-} glob;
+void drawingAreaSetup(GtkWidget *drawingArea) {        
+   GdkScreen *Screen;
+   GdkVisual *Visual;
 
-void do_drawing(cairo_t *cr) {
-   cairo_set_source_rgb(cr, 0, 0, 0);
-   cairo_set_line_width(cr, 0.5);
+   Screen = gdk_screen_get_default();
+   Visual = gdk_screen_get_rgba_visual(Screen);
 
-   for (int i = 0; i < glob.count - 1; i++ ) {
-      cairo_move_to(cr, glob.coordx[i], glob.coordy[i]);
-      cairo_line_to(cr, glob.coordx[i + 1], glob.coordy[i + 1]);
-      printf("%lf %lf\n", glob.coordx[i], glob.coordy[i]);
+   if (Visual != NULL && gdk_screen_is_composited(Screen)) {
+      gtk_widget_set_visual(drawingArea, Visual);
    }
-
-   glob.count = 0;
-   cairo_stroke(cr);    
 }
 
-gboolean on_draw_event(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
-   printf("X\n");
-   do_drawing(cr);
+void doDrawing(cairo_t *cr) {
+   for (int i = 0 ; i < path -> pointsNum - 1 ; i++) {
+      cairo_move_to(cr, path -> point[i].lat + i - 1, path -> point[i].lon + i - 1);
+      cairo_line_to(cr, path -> point[i + 1].lat + i, path -> point[i + 1].lon + i);
+      printf("%lf %lf\n", path -> point[i].lat + i, path -> point[i].lon + i);
+   }
+   cairo_line_to(cr, 30.8943, 26.739752);
+   cairo_stroke(cr);
+}
+
+gboolean onDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
+   doDrawing(cr);
    return FALSE;
 }
 
-
-gboolean clicked (GtkWidget *widget, gpointer user_data) {
-   for(int i = 0 ; i < 5 ; i++) {
-      glob.coordx[i] = i * 30;
-      glob.coordy[i] = i * 20;
-      glob.count = 5;
-   }
-   gtk_widget_queue_draw(widget);
-   return TRUE;   
-}

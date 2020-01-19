@@ -68,7 +68,6 @@ void handler(void *data, const char *object, int len) {
 bool pathParse (const char *fileName) {
     FILE *fp;
     if ((fp = fopen(fileName, "r")) == NULL) {
-        fileOpenError();
         return 1;
     }
     char *buff = malloc(BUFF_SIZE);
