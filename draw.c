@@ -19,7 +19,7 @@ void doDrawing(cairo_t *cr) {
    for (int i = 0 ; i < path -> pointsNum - 1 ; i++) {
       cairo_move_to(cr, path -> point[i].lat + i - 1, path -> point[i].lon + i - 1);
       cairo_line_to(cr, path -> point[i + 1].lat + i, path -> point[i + 1].lon + i);
-      printf("%lf %lf\n", path -> point[i].lat + i, path -> point[i].lon + i);
+      //printf("%lf %lf\n", path -> point[i].lat + i, path -> point[i].lon + i);
    }
    cairo_line_to(cr, 30.8943, 26.739752);
    cairo_stroke(cr);

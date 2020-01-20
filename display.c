@@ -42,87 +42,97 @@ void fileOpenError () {
  *  TWORZENIE INFORMACJI O DANEJ STATYSTYCE
  */
 char* makeLabelName (char *type) {
-   char nameBase[16];
+   char namePart[16];
    static char fullName[32];
    if(!strcmp(type, "date")) {
       strcpy(fullName, "Data: ");
-      g_snprintf(nameBase, 17, "%d", path -> date[0].day);
+      g_snprintf(namePart, 17, "%d", path -> date[0].day);
       if(path -> date[0].day < 10)
          strcat(fullName, "0");
-      strcat(fullName, nameBase);
+      strcat(fullName, namePart);
       strcat(fullName, ".");
-      g_snprintf(nameBase, 17, "%d", path -> date[0].month);
+      g_snprintf(namePart, 17, "%d", path -> date[0].month);
       if(path -> date[0].month < 10)
          strcat(fullName, "0");
-      strcat(fullName, nameBase);
+      strcat(fullName, namePart);
       strcat(fullName, ".");
-      g_snprintf(nameBase, 17, "%d", path -> date[0].year);
-      strcat(fullName, nameBase);
+      g_snprintf(namePart, 17, "%d", path -> date[0].year);
+      strcat(fullName, namePart);
    }
    else if(!strcmp(type, "time")) {
       strcpy(fullName, "Czas: ");
       if(pathDuration() / 3600 > 0) {
          if(pathDuration() / 3600 < 10)
             strcat(fullName, "0");
-         g_snprintf(nameBase, 17, "%lld", pathDuration() / 3600);
-         strcat(fullName, nameBase);
+         g_snprintf(namePart, 17, "%lld", pathDuration() / 3600);
+         strcat(fullName, namePart);
          strcat(fullName, ":");
       }
       if((pathDuration() % 3600) / 60 < 10)
          strcat(fullName, "0");
-      g_snprintf(nameBase, 17, "%lld", (pathDuration() % 3600) / 60);
-      strcat(fullName, nameBase);
+      g_snprintf(namePart, 17, "%lld", (pathDuration() % 3600) / 60);
+      strcat(fullName, namePart);
       strcat(fullName, ":");
       if(pathDuration() % 60 < 10)
          strcpy(fullName, "0");
-      g_snprintf(nameBase, 17, "%lld", pathDuration() % 60);
-      strcat(fullName, nameBase);
+      g_snprintf(namePart, 17, "%lld", pathDuration() % 60);
+      strcat(fullName, namePart);
    }
    else if(!strcmp(type, "dist")) {
       strcpy(fullName, "Dlugosc trasy: ");
-      g_snprintf(nameBase, 17, "%.2lf", fullDistance());
-      strcat(fullName, nameBase);
+      g_snprintf(namePart, 17, "%.2lf", fullDistance());
+      strcat(fullName, namePart);
       strcat(fullName, " km");
    }
    else if(!strcmp(type, "avgV")) {
       strcpy(fullName, "Srednia predkosc: ");
-      g_snprintf(nameBase, 16, "%.2lf",
-         fullDistance() / ((double)pathDuration() / 3600));
-      strcat(fullName, nameBase);
+      g_snprintf(namePart, 16, "%.2lf", averageSpeed());
+      strcat(fullName, namePart);
+      strcat(fullName, " km/h");
+   }
+   else if(!strcmp(type, "maxV")) {
+      strcpy(fullName, "Maksymalna predkosc: ");
+      g_snprintf(namePart, 16, "%.2lf", maxSpeed());
+      strcat(fullName, namePart);
+      strcat(fullName, " km/h");
+   }
+   else if(!strcmp(type, "minV")) {
+      strcpy(fullName, "Minimalna predkosc: ");
+      g_snprintf(namePart, 16, "%.2lf", minSpeed());
+      strcat(fullName, namePart);
       strcat(fullName, " km/h");
    }
    else if(!strcmp(type, "avgT")) {
       strcpy(fullName, "Srednie tempo: ");
-      g_snprintf(nameBase, 16, "%d",
-         (int)((double)pathDuration() / fullDistance() / 60));
-      strcat(fullName, nameBase);
+      g_snprintf(namePart, 16, "%d", (int)averageTempo());
+      strcat(fullName, namePart);
       strcat(fullName, ":");
       double decimalPart, seconds;
-      decimalPart = modf(pathDuration() / fullDistance() / 60, &seconds);
-      if((seconds = (int)(decimalPart * 60)) == 60)
-         seconds--;
-      g_snprintf(nameBase, 16, "%.0lf", seconds);
-      strcat(fullName, nameBase);
+      decimalPart = modf(averageTempo(), &seconds);
+      seconds = (int)(decimalPart * 60);
+      g_snprintf(namePart, 16, "%.0lf", seconds);
+      strcat(fullName, namePart);
       strcat(fullName, " min/km");
    }
    else if(!strcmp(type, "minH")) {
       strcpy(fullName, "Najnizszy punkt: ");
-      g_snprintf(nameBase, 16, "%.2lf", minHeight());
-      strcat(fullName, nameBase);
+      g_snprintf(namePart, 16, "%.2lf", minHeight());
+      strcat(fullName, namePart);
       strcat(fullName, " m");
    }
    else if(!strcmp(type, "maxH")) {
       strcpy(fullName, "Najwyzszy punkt: ");
-      g_snprintf(nameBase, 16, "%.2lf", maxHeight());
-      strcat(fullName, nameBase);
+      g_snprintf(namePart, 16, "%.2lf", maxHeight());
+      strcat(fullName, namePart);
       strcat(fullName, " m");
    }
    else if(!strcmp(type, "difH")) {
       strcpy(fullName, "Roznica wysokosci: ");
-      g_snprintf(nameBase, 16, "%.2lf", heightDif ());
-      strcat(fullName, nameBase);
+      g_snprintf(namePart, 16, "%.2lf", heightDif ());
+      strcat(fullName, namePart);
       strcat(fullName, " m");
    }
+   maxSpeed();
    return fullName;
 }
 /*
@@ -138,6 +148,8 @@ void statsWindow (char *fileName) {
       GtkWidget *timeText;
       GtkWidget *distanceText;
       GtkWidget *avgSpeedText;
+      GtkWidget *maxSpeedText;
+      GtkWidget *minSpeedText;
       GtkWidget *avgTempoText;
       GtkWidget *minHText;
       GtkWidget *maxHText;
@@ -171,6 +183,12 @@ void statsWindow (char *fileName) {
       /* ŚREDNIA PRĘDKOŚĆ */
       avgSpeedText = gtk_label_new(makeLabelName("avgV"));
       gtk_box_pack_start(GTK_BOX(statsBox), avgSpeedText, TRUE, TRUE, 0);
+
+      maxSpeedText = gtk_label_new(makeLabelName("maxV"));
+      gtk_box_pack_start(GTK_BOX(statsBox), maxSpeedText, TRUE, TRUE, 0);
+
+      minSpeedText = gtk_label_new(makeLabelName("minV"));
+      gtk_box_pack_start(GTK_BOX(statsBox), minSpeedText, TRUE, TRUE, 0);
 
       avgTempoText = gtk_label_new(makeLabelName("avgT"));
       gtk_box_pack_start(GTK_BOX(statsBox), avgTempoText, TRUE, TRUE, 0);

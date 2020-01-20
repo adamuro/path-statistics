@@ -99,18 +99,53 @@ int daysTillMonth (PtDate date) {
 	}
 	return days;
 }
-
-long long pathDuration () {
-	PtDate startDate = path -> date[0];
-	PtDate endDate = path -> date[path -> dateNum - 1];
-	long long duration = 0;
+/* ROZNICA CZASU MIĘDZY DWOMA PUNKTAMI W SEKUNDACH */
+long long timeDifference (PtDate startDate, PtDate endDate) {
+	long long timeDifference = 0;
 	for(int i = startDate.year ; i < endDate.year ; i++)
-		duration += (leapYear(i)) ? 366 * 24 * 3600 : 365 * 24 * 3600;
-	duration += daysTillMonth(endDate) * 24 * 3600 +
+		timeDifference += (leapYear(i)) ? 366 * 24 * 3600 : 365 * 24 * 3600;
+	timeDifference += daysTillMonth(endDate) * 24 * 3600 +
 				endDate.day * 24 * 3600 + endDate.hour * 3600 +
 				endDate.minute * 60 + endDate.second;
-	duration -= daysTillMonth(startDate) * 24 * 3600 +
+	timeDifference -= daysTillMonth(startDate) * 24 * 3600 +
 				startDate.day * 24 * 3600 + startDate.hour * 3600 +
 				startDate.minute * 60 + startDate.second;
-	return duration;
+	return timeDifference;
+}
+
+long long pathDuration () {
+	return timeDifference(path -> date[0], path -> date[path -> dateNum - 1]);
+}
+
+double singleSpeed (int startPointIndex, int endPointIndex) {
+	return singleDistance(path -> point[startPointIndex], path -> point[endPointIndex])
+		/ ((double)timeDifference(path -> date[startPointIndex], path -> date[endPointIndex]) / 3600);
+}
+
+double averageSpeed () {
+	return fullDistance() / ((double)pathDuration() / 3600);
+}
+
+double maxSpeed () {
+	double maxSpeed = singleSpeed(0, 1);
+	for(int i = 2 ; i < path -> pointsNum ; i++) {
+		if(singleSpeed(i - 1, i) > maxSpeed && singleSpeed(i - 1, i) != INFINITY) {
+			maxSpeed = singleSpeed(i - 1, i);
+		}
+	}
+	return maxSpeed;
+}
+
+double minSpeed () {
+	double minSpeed = singleSpeed(0, 1);
+	for(int i = 2 ; i < path -> pointsNum ; i++) {
+		if(singleSpeed(i - 1, i) < minSpeed && singleSpeed(i - 1, i) != 0) {
+			minSpeed = singleSpeed(i - 1, i);
+		}
+	}
+	return minSpeed;
+}
+
+double averageTempo () {
+	return 1 / averageSpeed() * 60;
 }

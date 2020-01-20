@@ -16,6 +16,18 @@ double heightDif ();
 
 void getDate (PtDate *date, int dateNum, char *dateStr);
 
+long long timeDifference (PtDate startDate, PtDate endDate);
+
 long long pathDuration ();
+
+double singleSpeed (int startPointIndex, int endPointIndex);
+
+double averageSpeed ();
+
+double maxSpeed ();
+
+double minSpeed ();
+
+double averageTempo ();
 
 #endif
