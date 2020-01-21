@@ -23,7 +23,7 @@ double atofC (const char *str) {
 	return coord;
 }
 /*
- *	ODLEGŁOŚCI
+ *	ODLEGŁOŚĆ MIĘDZY DWOMA PUNKTAMI
  */
 double singleDistance (Pt p1, Pt p2) {
     double dist = 6371.0 * acos(sin(p1.lat / 180.0 * M_PI) * sin(p2.lat / 180.0 * M_PI) +
@@ -31,7 +31,9 @@ double singleDistance (Pt p1, Pt p2) {
         cos(p1.lon / 180.0 * M_PI - p2.lon / 180.0 * M_PI));
     return dist;
 }
-
+/*
+ *  DYSTANS CAŁEJ TRASY
+ */
 double fullDistance () {
     double fullDist = 0;
     for(int i = 1 ; i < path -> pointsNum ; i++) {
@@ -40,7 +42,7 @@ double fullDistance () {
     return fullDist;
 }
 /*
- *	WYSOKOŚCI
+ *	NAJNIŻSZY PUNKT
  */
 double minHeight () {
 	double minH = path -> height[0];
@@ -50,7 +52,9 @@ double minHeight () {
 	}
 	return minH;
 }
-
+/*
+ *  NAJWYŻSZY PUNKT
+ */
 double maxHeight () {
 	double maxH = path -> height[0];
 	for(int i = 1 ; i < path -> hNum ; i++) {
@@ -59,12 +63,14 @@ double maxHeight () {
 	}
 	return maxH;
 }
-
+/*
+ *  RÓŻNICA MIĘDZY NAJWYŻSZYM I NAJNIŻSZYM PUNKTEM
+ */
 double heightDif () {
     return maxHeight(path) - minHeight(path);
 }
 /*
- *	DATY
+ *	ODCZYTANIE POJEDYNCZEJ DATY Z PLIKU GPX
  */
 void getDate (PtDate *date, int dateNum, char *dateStr) {
 	char dateMember[4];
@@ -82,13 +88,17 @@ void getDate (PtDate *date, int dateNum, char *dateStr) {
 	strncpy(dateMember, dateStr + 17, 2);
 	date[dateNum].second = atoi(dateMember);
 }
-
+/*
+ *  CZY ROK JEST PRZESTĘPNY
+ */
 bool leapYear (int year) {
 	if((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
 		return 1;
 	return 0;
 }
-
+/*
+ *  LICZBA DNI OD POCZĄTKU ROKU DO MIESIĄCA
+ */
 int daysTillMonth (PtDate date) {
 	int daysNum[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	int days = 0;
@@ -99,7 +109,9 @@ int daysTillMonth (PtDate date) {
 	}
 	return days;
 }
-/* ROZNICA CZASU MIĘDZY DWOMA PUNKTAMI W SEKUNDACH */
+/*
+ * ROZNICA CZASU MIĘDZY DWOMA PUNKTAMI W SEKUNDACH
+ */
 long long timeDifference (PtDate startDate, PtDate endDate) {
 	long long timeDifference = 0;
 	for(int i = startDate.year ; i < endDate.year ; i++)
@@ -112,40 +124,84 @@ long long timeDifference (PtDate startDate, PtDate endDate) {
 				startDate.minute * 60 + startDate.second;
 	return timeDifference;
 }
-
+/*
+ *  CZAS TRWANIA TRASY
+ */
 long long pathDuration () {
 	return timeDifference(path -> date[0], path -> date[path -> dateNum - 1]);
 }
-
+/*
+ *  PRĘDKOŚĆ MIĘDZY DWOMA PUNKTAMI
+ */
 double singleSpeed (int startPointIndex, int endPointIndex) {
 	return singleDistance(path -> point[startPointIndex], path -> point[endPointIndex])
 		/ ((double)timeDifference(path -> date[startPointIndex], path -> date[endPointIndex]) / 3600);
 }
-
+/*
+ *  ŚREDNIA PRĘDKOŚĆ
+ */
 double averageSpeed () {
 	return fullDistance() / ((double)pathDuration() / 3600);
 }
-
+/*
+ *  NAJWYŻSZA PRĘDKOŚĆ
+ */
 double maxSpeed () {
-	double maxSpeed = singleSpeed(0, 1);
-	for(int i = 2 ; i < path -> pointsNum ; i++) {
-		if(singleSpeed(i - 1, i) > maxSpeed && singleSpeed(i - 1, i) != INFINITY) {
-			maxSpeed = singleSpeed(i - 1, i);
+	double maxSpeed;
+	double tempDist;
+	double tempTime;
+	double tempSpeed;
+
+	for(int i = 3 ; i < path -> pointsNum ; i++) {
+		tempDist = 0;
+		tempTime = timeDifference(path -> date[i - 3], path -> date[i]);
+		for(int j = 3 ; j > 0 ; j--) {
+			tempDist += singleDistance(path -> point[i - j], path -> point[i - j + 1]);
 		}
+		tempSpeed = tempDist / (tempTime / 3600);
+		if(tempSpeed > maxSpeed)
+			maxSpeed = tempSpeed;
 	}
 	return maxSpeed;
 }
-
+/*
+ *  NAJNIŻSZA PRĘDKOŚĆ
+ */
 double minSpeed () {
-	double minSpeed = singleSpeed(0, 1);
-	for(int i = 2 ; i < path -> pointsNum ; i++) {
-		if(singleSpeed(i - 1, i) < minSpeed && singleSpeed(i - 1, i) != 0) {
-			minSpeed = singleSpeed(i - 1, i);
+	double minSpeed = maxSpeed();
+	double tempDist;
+	double tempTime;
+	double tempSpeed;
+
+	for(int i = 3 ; i < path -> pointsNum ; i++) {
+		tempDist = 0;
+		tempTime = timeDifference(path -> date[i - 3], path -> date[i]);
+		for(int j = 3 ; j > 0 ; j--) {
+			double isMoving = singleDistance(path -> point[i - j], path -> point[i - j + 1]);
+			if(isMoving)
+				tempDist += isMoving;
 		}
+		tempSpeed = tempDist / (tempTime / 3600);
+		if(tempSpeed < minSpeed && tempSpeed != 0)
+			minSpeed = tempSpeed;
 	}
 	return minSpeed;
 }
-
+/*
+ *  NAJWYŻSZE TEMPO
+ */
+double maxTempo () {
+	return 1 / maxSpeed() * 60;
+}
+/*
+ *  NAJNIŻSZE TEMPO
+ */
+double minTempo () {
+	return 1 / minSpeed() * 60;
+}
+/*
+ *  ŚREDNIE TEMPO
+ */
 double averageTempo () {
 	return 1 / averageSpeed() * 60;
 }

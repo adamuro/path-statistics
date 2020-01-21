@@ -110,6 +110,36 @@ char* makeLabelName (char *type) {
       double decimalPart, seconds;
       decimalPart = modf(averageTempo(), &seconds);
       seconds = (int)(decimalPart * 60);
+      if(seconds < 10)
+         strcat(fullName, "0");
+      g_snprintf(namePart, 16, "%.0lf", seconds);
+      strcat(fullName, namePart);
+      strcat(fullName, " min/km");
+   }
+   else if(!strcmp(type, "maxT")) {
+      strcpy(fullName, "Maksymalne tempo: ");
+      g_snprintf(namePart, 16, "%d", (int)maxTempo());
+      strcat(fullName, namePart);
+      strcat(fullName, ":");
+      double decimalPart, seconds;
+      decimalPart = modf(maxTempo(), &seconds);
+      seconds = (int)(decimalPart * 60);
+      if(seconds < 10)
+         strcat(fullName, "0");
+      g_snprintf(namePart, 16, "%.0lf", seconds);
+      strcat(fullName, namePart);
+      strcat(fullName, " min/km");
+   }
+   else if(!strcmp(type, "minT")) {
+      strcpy(fullName, "Minimalne tempo: ");
+      g_snprintf(namePart, 16, "%d", (int)minTempo());
+      strcat(fullName, namePart);
+      strcat(fullName, ":");
+      double decimalPart, seconds;
+      decimalPart = modf(minTempo(), &seconds);
+      seconds = (int)(decimalPart * 60);
+      if(seconds < 10)
+         strcat(fullName, "0");
       g_snprintf(namePart, 16, "%.0lf", seconds);
       strcat(fullName, namePart);
       strcat(fullName, " min/km");
@@ -151,6 +181,8 @@ void statsWindow (char *fileName) {
       GtkWidget *maxSpeedText;
       GtkWidget *minSpeedText;
       GtkWidget *avgTempoText;
+      GtkWidget *maxTempoText;
+      GtkWidget *minTempoText;
       GtkWidget *minHText;
       GtkWidget *maxHText;
       GtkWidget *difHText;
@@ -183,15 +215,21 @@ void statsWindow (char *fileName) {
       /* ŚREDNIA PRĘDKOŚĆ */
       avgSpeedText = gtk_label_new(makeLabelName("avgV"));
       gtk_box_pack_start(GTK_BOX(statsBox), avgSpeedText, TRUE, TRUE, 0);
-
+      /* NAJWYŻSZA PRĘDKOŚĆ */
       maxSpeedText = gtk_label_new(makeLabelName("maxV"));
       gtk_box_pack_start(GTK_BOX(statsBox), maxSpeedText, TRUE, TRUE, 0);
-
+      /* NAJNIŻSZA PRĘDKOŚĆ */
       minSpeedText = gtk_label_new(makeLabelName("minV"));
       gtk_box_pack_start(GTK_BOX(statsBox), minSpeedText, TRUE, TRUE, 0);
-
+      /* ŚREDNIE TEMPO */
       avgTempoText = gtk_label_new(makeLabelName("avgT"));
       gtk_box_pack_start(GTK_BOX(statsBox), avgTempoText, TRUE, TRUE, 0);
+      /* NAJWYŻSZE TEMPO */
+      maxTempoText = gtk_label_new(makeLabelName("maxT"));
+      gtk_box_pack_start(GTK_BOX(statsBox), maxTempoText, TRUE, TRUE, 0);
+      /* NAJNIŻSZE TEMPO */
+      minTempoText = gtk_label_new(makeLabelName("minT"));
+      gtk_box_pack_start(GTK_BOX(statsBox), minTempoText, TRUE, TRUE, 0);
       /* NAJNIŻSZY PUNKT */
       minHText = gtk_label_new(makeLabelName("minH"));
       gtk_box_pack_start(GTK_BOX(statsBox), minHText, TRUE, TRUE, 0);
@@ -255,12 +293,16 @@ void helpWindow () {
 
    gtk_widget_show_all(helpWindow);
 }
-
+/*
+ *  USTAWIANIE POLA TEKSTOWEGO
+ */
 void setEntry (GtkWidget *widget, GtkWidget *entry) {
    gtk_editable_select_region(GTK_EDITABLE(entry), 0, gtk_entry_get_text_length(GTK_ENTRY(entry)));
    gtk_widget_grab_focus(entry);
 }
-
+/*
+ *  DIALOG WYBORU PLIKU
+ */
 void fileSelection () {
    GtkWidget *fileSelectionDialog;
    fileSelectionDialog = gtk_file_chooser_dialog_new("Wybierz plik", NULL, 
@@ -310,7 +352,7 @@ void mainMenu () {
    gtk_entry_set_text(GTK_ENTRY(entry), "Wprowadz tekst");
    gtk_editable_select_region(GTK_EDITABLE(entry), 0, gtk_entry_get_text_length(GTK_ENTRY(entry)));
    gtk_box_pack_start(GTK_BOX(fileSelectionBox), entry, TRUE, TRUE, 0);
-
+   /* PRZYCISK OTWIERAJĄCY DIALOG WYBORU PLIKU */
    browseButton = gtk_button_new_with_label("...");
    g_signal_connect(browseButton, "clicked", G_CALLBACK(fileSelection), NULL);
    gtk_box_pack_start(GTK_BOX(fileSelectionBox), browseButton, TRUE, TRUE, 0);

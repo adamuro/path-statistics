@@ -28,6 +28,10 @@ double maxSpeed ();
 
 double minSpeed ();
 
+double maxTempo ();
+
+double minTempo ();
+
 double averageTempo ();
 
 #endif

@@ -76,11 +76,13 @@ void handler(void *data, const char *object, int len) {
 
 bool pathParse (const char *fileName) {
     FILE *fp;
+    
     if ((fp = fopen(fileName, "r")) == NULL) {
         return 1;
     }
-    char *buff = malloc(BUFF_SIZE);
+
     pathInit();
+    char *buff = malloc(BUFF_SIZE);
 
     XML_Parser parser = XML_ParserCreate(NULL);
     XML_SetElementHandler(parser, start_element, end_element);
@@ -93,5 +95,6 @@ bool pathParse (const char *fileName) {
     fclose(fp);
     free(buff);
     XML_ParserFree(parser);
+    
     return 0;
 }
