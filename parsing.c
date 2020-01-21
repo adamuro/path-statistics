@@ -93,8 +93,9 @@ bool pathParse (const char *fileName) {
     XML_Parse(parser, buff, strlen(buff), XML_TRUE);
 
     fclose(fp);
+    free(fp);
     free(buff);
     XML_ParserFree(parser);
-    
+
     return 0;
 }

@@ -332,7 +332,7 @@ void mainMenu () {
    GtkWidget *helpButton;
 
    mainMenu = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-   gtk_window_set_title(GTK_WINDOW(mainMenu), "Testowy program");
+   gtk_window_set_title(GTK_WINDOW(mainMenu), "Statystyki trasy");
    gtk_window_set_default_size(GTK_WINDOW(mainMenu), 400, 280);
    gtk_window_set_position(GTK_WINDOW(mainMenu), GTK_WIN_POS_CENTER);
    gtk_window_set_resizable(GTK_WINDOW(mainMenu), FALSE);
