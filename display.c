@@ -74,7 +74,7 @@ char* makeLabelName (char *type) {
       strcat(fullName, namePart);
       strcat(fullName, ":");
       if(pathDuration() % 60 < 10)
-         strcpy(fullName, "0");
+         strcat(fullName, "0");
       g_snprintf(namePart, 17, "%lld", pathDuration() % 60);
       strcat(fullName, namePart);
    }
@@ -89,18 +89,21 @@ char* makeLabelName (char *type) {
       g_snprintf(namePart, 16, "%.2lf", averageSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
+      printf("avgv %lf\n", averageSpeed());
    }
    else if(!strcmp(type, "maxV")) {
       strcpy(fullName, "Maksymalna predkosc: ");
       g_snprintf(namePart, 16, "%.2lf", maxSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
+      printf("maxv %lf\n", maxSpeed());
    }
    else if(!strcmp(type, "minV")) {
       strcpy(fullName, "Minimalna predkosc: ");
       g_snprintf(namePart, 16, "%.2lf", minSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
+      printf("minv %lf\n", minSpeed());
    }
    else if(!strcmp(type, "avgT")) {
       strcpy(fullName, "Srednie tempo: ");
@@ -115,6 +118,7 @@ char* makeLabelName (char *type) {
       g_snprintf(namePart, 16, "%.0lf", seconds);
       strcat(fullName, namePart);
       strcat(fullName, " min/km");
+      printf("avgt %lf\n", averageTempo());
    }
    else if(!strcmp(type, "maxT")) {
       strcpy(fullName, "Maksymalne tempo: ");
@@ -162,7 +166,6 @@ char* makeLabelName (char *type) {
       strcat(fullName, namePart);
       strcat(fullName, " m");
    }
-   maxSpeed();
    return fullName;
 }
 /*

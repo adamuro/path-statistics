@@ -20,17 +20,17 @@ void pathInit () {
 void pathFree () {
     path -> pointsNum = 0;
     if(path -> point != NULL) {
-        free(path -> point);
+        //free(path -> point);
         path -> point = NULL;
     }
     path -> dateNum = 0;
     if(path -> date != NULL) {
-        free(path -> date);
+        //free(path -> date);
         path -> date = NULL;
     }
     path -> hNum = 0;
     if(path -> height != NULL) {
-        free(path -> height);
+        //free(path -> height);
         path -> height = NULL;
     }
 }
@@ -65,8 +65,8 @@ void handler(void *data, const char *object, int len) {
             }
         }
         else if(object[len + 2] == 'e'){
-            char heightStr [len - 3];
-            strncpy(heightStr, object, len - 3);
+            char heightStr [len];
+            strncpy(heightStr, object, len);
             path -> height = realloc(path -> height, (path -> hNum + 1) * sizeof(double));
             path -> height[path -> hNum] = atofC(heightStr);
             path -> hNum++;
@@ -93,7 +93,6 @@ bool pathParse (const char *fileName) {
     XML_Parse(parser, buff, strlen(buff), XML_TRUE);
 
     fclose(fp);
-    free(fp);
     free(buff);
     XML_ParserFree(parser);
 

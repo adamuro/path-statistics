@@ -16,7 +16,7 @@ double atofC (const char *str) {
 		coord *= 10;
 		coord += str[i] - 48;
 	}
-	while(++i < strlen(str) - 1) {
+	while(++i < strlen(str)) {
 		coord += ((double)str[i] - 48) / div;
 		div *= 10;
 	}
@@ -29,7 +29,11 @@ double singleDistance (Pt p1, Pt p2) {
     double dist = 6371.0 * acos(sin(p1.lat / 180.0 * M_PI) * sin(p2.lat / 180.0 * M_PI) +
         cos(p1.lat / 180.0 * M_PI) * cos(p2.lat / 180.0 * M_PI) *
         cos(p1.lon / 180.0 * M_PI - p2.lon / 180.0 * M_PI));
-    return dist;
+    if(!isnan(dist)) {
+    	//printf("%lf %lf %lf\n", p1.lat, p1.lon, dist);
+    	return dist;
+    }
+    return 0;
 }
 /*
  *  DYSTANS CAŁEJ TRASY
@@ -38,7 +42,9 @@ double fullDistance () {
     double fullDist = 0;
     for(int i = 1 ; i < path -> pointsNum ; i++) {
         fullDist += singleDistance(path -> point[i - 1], path -> point[i]);
+        //printf("%lf\n", fullDist);
     }
+    //printf("full dist: %lf\n", fullDist);
     return fullDist;
 }
 /*
@@ -117,10 +123,10 @@ long long timeDifference (PtDate startDate, PtDate endDate) {
 	for(int i = startDate.year ; i < endDate.year ; i++)
 		timeDifference += (leapYear(i)) ? 366 * 24 * 3600 : 365 * 24 * 3600;
 	timeDifference += daysTillMonth(endDate) * 24 * 3600 +
-				endDate.day * 24 * 3600 + endDate.hour * 3600 +
+				(endDate.day - 1) * 24 * 3600 + endDate.hour * 3600 +
 				endDate.minute * 60 + endDate.second;
 	timeDifference -= daysTillMonth(startDate) * 24 * 3600 +
-				startDate.day * 24 * 3600 + startDate.hour * 3600 +
+				(startDate.day - 1) * 24 * 3600 + startDate.hour * 3600 +
 				startDate.minute * 60 + startDate.second;
 	return timeDifference;
 }
@@ -147,8 +153,9 @@ double averageSpeed () {
  *  NAJWYŻSZA PRĘDKOŚĆ
  */
 double maxSpeed () {
-	double maxSpeed;
-	double tempDist;
+	double maxSpeed = 0;
+	double tempSpeed;
+/*	double tempDist;
 	double tempTime;
 	double tempSpeed;
 
@@ -162,6 +169,20 @@ double maxSpeed () {
 		if(tempSpeed > maxSpeed)
 			maxSpeed = tempSpeed;
 	}
+	return maxSpeed;
+	*/
+	//printf("%d %d %d\n", path -> pointsNum, path -> hNum, path -> dateNum);
+	for(int i = 1 ; i < path -> pointsNum ; i++) {
+		//printf("1. single dist. %lf\n", singleDistance(path -> point[i - 1], path -> point[i]));
+		//printf("2. time dif. %lf\n", (double)timeDifference(path -> date[i - 1], path -> date[i]) / 3600);
+		//printf("3. date %d %d %d\n", path -> date[i].hour, path -> date[i].minute, path -> date[i].second);
+		tempSpeed = singleDistance(path -> point[i - 1], path -> point[i])
+			/ ((double)timeDifference(path -> date[i - 1], path -> date[i]) / 3600);
+		if(tempSpeed > maxSpeed && tempSpeed != INFINITY)
+			maxSpeed = tempSpeed;
+		printf("4. max v %lf\n", maxSpeed);
+	}
+	printf(". max v %lf\n", maxSpeed);
 	return maxSpeed;
 }
 /*
