@@ -7,6 +7,10 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+#ifndef R
+#define R 6371
+#endif
+
 /* Standardowy atof nie działa */
 double atofC (const char *str) {
 	double coord = 0;
@@ -180,9 +184,9 @@ double maxSpeed () {
 			/ ((double)timeDifference(path -> date[i - 1], path -> date[i]) / 3600);
 		if(tempSpeed > maxSpeed && tempSpeed != INFINITY)
 			maxSpeed = tempSpeed;
-		printf("4. max v %lf\n", maxSpeed);
+		//printf("4. max v %lf\n", maxSpeed);
 	}
-	printf(". max v %lf\n", maxSpeed);
+	//printf(". max v %lf\n", maxSpeed);
 	return maxSpeed;
 }
 /*
@@ -226,3 +230,60 @@ double minTempo () {
 double averageTempo () {
 	return 1 / averageSpeed() * 60;
 }
+
+double convertToCartesianX (Pt point) {
+	return R * cos(point.lat * M_PI * 2.0 / 360.0) * cos(point.lon * M_PI * 2.0 / 360.0);
+}
+
+double convertToCartesianY (Pt point) {
+	return R * cos(point.lat * M_PI * 2.0 / 360.0) * sin(point.lon * M_PI * 2.0 / 360.0);
+}
+
+double minCartesianX (Pt *point, int pointsNum) {
+	double minCartesianX = convertToCartesianX(point[0]);
+	for(int i = 1 ; i < pointsNum ; i++) {
+		int cartesian = convertToCartesianX(point[i]);
+		if(cartesian < minCartesianX)
+			minCartesianX = cartesian;
+	}
+	return minCartesianX;
+}
+
+double minCartesianY (Pt *point, int pointsNum) {
+	double minCartesianY = convertToCartesianY(point[0]);
+	for(int i = 1 ; i < pointsNum ; i++) {
+		int cartesian = convertToCartesianY(point[i]);
+		if(cartesian < minCartesianY)
+			minCartesianY = cartesian;
+	}
+	return minCartesianY;
+}
+
+double cartesianDifX (Pt *point, int pointsNum) {
+	double maxCartesianX = convertToCartesianX(point[0]);
+	for(int i = 1 ; i < pointsNum ; i++) {
+		int cartesian = convertToCartesianX(point[i]);
+		if(cartesian > maxCartesianX)
+			maxCartesianX = cartesian;
+	}
+	return maxCartesianX - minCartesianX(point, pointsNum);
+}
+
+double cartesianDifY (Pt *point, int pointsNum) {
+	double maxCartesianY = convertToCartesianY(point[0]);
+	for(int i = 1 ; i < pointsNum ; i++) {
+		int cartesian = convertToCartesianY(point[i]);
+		if(cartesian > maxCartesianY)
+			maxCartesianY = cartesian;
+	}
+	return maxCartesianY - minCartesianY(point, pointsNum);
+}
+
+/*
+	a.x = R * cos(g->lat * TO_PI) * cos(g->lon * TO_PI);
+    a.y = R * cos(g->lat * TO_PI) * sin(g->lon * TO_PI);
+    a.z = R * sin(g->lat * TO_PI);
+
+    const int R = 6371000; // metrów
+	const double TO_PI = 3.1415926536 * 2.0 / 360.0;
+*/

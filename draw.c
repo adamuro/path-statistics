@@ -2,6 +2,13 @@
 #include <gtk/gtk.h>
 #include "structures.h"
 #include "parsing.h"
+#include "calculations.h"
+#ifndef MapWidth
+#define MapWidth 450
+#endif
+#ifndef MapHeight
+#define MapHeight 300
+#endif
 /*
  *  PRZYGOTOWANIE OBSZARU DO RYSOWANIA
  */
@@ -20,12 +27,19 @@ void drawingAreaSetup (GtkWidget *drawingArea) {
  *  RYSOWANIE MAPY
  */
 void doDrawing (cairo_t *cr) {
+   double difX = cartesianDifX(path -> point, path -> pointsNum);
+   double difY = cartesianDifY(path -> point, path -> pointsNum);
+   double minX = minCartesianX(path -> point, path -> pointsNum);
+   double minY = minCartesianY(path -> point, path -> pointsNum);
+   
    for (int i = 0 ; i < path -> pointsNum - 1 ; i++) {
-      cairo_move_to(cr, path -> point[i].lat + i - 1, path -> point[i].lon + i - 1);
-      cairo_line_to(cr, path -> point[i + 1].lat + i, path -> point[i + 1].lon + i);
-      //printf("%lf %lf\n", path -> point[i].lat + i, path -> point[i].lon + i);
+      cairo_move_to(cr, (convertToCartesianX(path -> point[i]) - minX) * (MapWidth / difX),
+         (convertToCartesianY(path -> point[i]) - minY) * (MapHeight / difY));
+      cairo_line_to(cr, (convertToCartesianX(path -> point[i + 1]) - minX) * (MapWidth / difX),
+         (convertToCartesianY(path -> point[i + 1]) - minY) * (MapHeight / difY));
+      //printf("%lf %lf\n", convertToCartesianX(path -> point[i]), convertToCartesianY(path -> point[i]));
    }
-   cairo_line_to(cr, 30.8943, 26.739752);
+
    cairo_stroke(cr);
 }
 /*

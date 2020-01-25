@@ -34,4 +34,16 @@ double minTempo ();
 
 double averageTempo ();
 
+double convertToCartesianX (Pt point);
+
+double convertToCartesianY (Pt point);
+
+double minCartesianX (Pt *point, int pointsNum);
+
+double minCartesianY (Pt *point, int pointsNum);
+
+double cartesianDifX (Pt *point, int pointsNum);
+
+double cartesianDifY (Pt *point, int pointsNum);
+
 #endif

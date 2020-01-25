@@ -89,21 +89,21 @@ char* makeLabelName (char *type) {
       g_snprintf(namePart, 16, "%.2lf", averageSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
-      printf("avgv %lf\n", averageSpeed());
+      //printf("avgv %lf\n", averageSpeed());
    }
    else if(!strcmp(type, "maxV")) {
       strcpy(fullName, "Maksymalna predkosc: ");
       g_snprintf(namePart, 16, "%.2lf", maxSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
-      printf("maxv %lf\n", maxSpeed());
+      //printf("maxv %lf\n", maxSpeed());
    }
    else if(!strcmp(type, "minV")) {
       strcpy(fullName, "Minimalna predkosc: ");
       g_snprintf(namePart, 16, "%.2lf", minSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
-      printf("minv %lf\n", minSpeed());
+      //printf("minv %lf\n", minSpeed());
    }
    else if(!strcmp(type, "avgT")) {
       strcpy(fullName, "Srednie tempo: ");
@@ -118,7 +118,7 @@ char* makeLabelName (char *type) {
       g_snprintf(namePart, 16, "%.0lf", seconds);
       strcat(fullName, namePart);
       strcat(fullName, " min/km");
-      printf("avgt %lf\n", averageTempo());
+      //printf("avgt %lf\n", averageTempo());
    }
    else if(!strcmp(type, "maxT")) {
       strcpy(fullName, "Maksymalne tempo: ");
@@ -193,6 +193,7 @@ void statsWindow (char *fileName) {
       GtkWidget *closeButton;
 
       statsWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+      gtk_window_set_position(GTK_WINDOW(statsWindow), GTK_WIN_POS_CENTER);
       gtk_window_set_title(GTK_WINDOW(statsWindow), "Statystyki");
       gtk_window_set_default_size(GTK_WINDOW(statsWindow), 800, 400);
       gtk_container_set_border_width(GTK_CONTAINER(statsWindow), 10);
