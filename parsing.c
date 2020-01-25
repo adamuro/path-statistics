@@ -18,22 +18,11 @@ void pathInit () {
 }
 
 void pathFree () {
-    path -> pointsNum = 0;
-    if(path -> point != NULL) {
-        free(path -> point);
-        path -> point = NULL;
-    }
-    path -> dateNum = 0;
-    if(path -> date != NULL) {
-        free(path -> date);
-        path -> date = NULL;
-    }
-    path -> hNum = 0;
-    if(path -> height != NULL) {
-        free(path -> height);
-        path -> height = NULL;
-    }
+    free(path -> point);
+    free(path -> date);
+    free(path -> height);
 }
+
 /*
  *  PARSOWANIE
  */

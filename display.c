@@ -259,7 +259,7 @@ void statsWindow (char *fileName) {
       g_signal_connect(closeButton, "clicked", G_CALLBACK(gtk_window_close), statsWindow);
 
       g_signal_connect(statsWindow, "destroy", G_CALLBACK(gtk_widget_destroy), statsWindow);
-      g_signal_connect(statsWindow, "destroy", G_CALLBACK(pathFree), statsWindow);
+      //g_signal_connect(statsWindow, "destroy", G_CALLBACK(pathFree), statsWindow);
 
       gtk_widget_show_all(statsWindow);
    }

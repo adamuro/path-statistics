@@ -1,6 +1,8 @@
 #ifndef PARSING_H
 #define PARSING_H
 
+void pathInit ();
+
 void pathFree ();
 
 void start_element (void *data, const char *element, const char **attribute);

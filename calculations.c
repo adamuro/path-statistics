@@ -193,21 +193,13 @@ double maxSpeed () {
  *  NAJNIŻSZA PRĘDKOŚĆ
  */
 double minSpeed () {
-	double minSpeed = maxSpeed();
-	double tempDist;
-	double tempTime;
+	double minSpeed = singleDistance(path -> point[0], path -> point[1])
+			/ ((double)timeDifference(path -> date[0], path -> date[1]) / 3600);
 	double tempSpeed;
-
-	for(int i = 3 ; i < path -> pointsNum ; i++) {
-		tempDist = 0;
-		tempTime = timeDifference(path -> date[i - 3], path -> date[i]);
-		for(int j = 3 ; j > 0 ; j--) {
-			double isMoving = singleDistance(path -> point[i - j], path -> point[i - j + 1]);
-			if(isMoving)
-				tempDist += isMoving;
-		}
-		tempSpeed = tempDist / (tempTime / 3600);
-		if(tempSpeed < minSpeed && tempSpeed != 0)
+	for(int i = 2 ; i < path -> pointsNum ; i++) {
+		tempSpeed = singleDistance(path -> point[i - 1], path -> point[i])
+			/ ((double)timeDifference(path -> date[i - 1], path -> date[i]) / 3600);
+		if(tempSpeed < minSpeed && tempSpeed != INFINITY && tempSpeed != 0)
 			minSpeed = tempSpeed;
 	}
 	return minSpeed;
@@ -278,12 +270,3 @@ double cartesianDifY (Pt *point, int pointsNum) {
 	}
 	return maxCartesianY - minCartesianY(point, pointsNum);
 }
-
-/*
-	a.x = R * cos(g->lat * TO_PI) * cos(g->lon * TO_PI);
-    a.y = R * cos(g->lat * TO_PI) * sin(g->lon * TO_PI);
-    a.z = R * sin(g->lat * TO_PI);
-
-    const int R = 6371000; // metrów
-	const double TO_PI = 3.1415926536 * 2.0 / 360.0;
-*/
