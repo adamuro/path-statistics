@@ -89,21 +89,18 @@ char* makeLabelName (char *type) {
       g_snprintf(namePart, 16, "%.2lf", averageSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
-      //printf("avgv %lf\n", averageSpeed());
    }
    else if(!strcmp(type, "maxV")) {
       strcpy(fullName, "Maksymalna predkosc: ");
       g_snprintf(namePart, 16, "%.2lf", maxSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
-      //printf("maxv %lf\n", maxSpeed());
    }
    else if(!strcmp(type, "minV")) {
       strcpy(fullName, "Minimalna predkosc: ");
       g_snprintf(namePart, 16, "%.2lf", minSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
-      //printf("minv %lf\n", minSpeed());
    }
    else if(!strcmp(type, "avgT")) {
       strcpy(fullName, "Srednie tempo: ");
@@ -118,7 +115,6 @@ char* makeLabelName (char *type) {
       g_snprintf(namePart, 16, "%.0lf", seconds);
       strcat(fullName, namePart);
       strcat(fullName, " min/km");
-      //printf("avgt %lf\n", averageTempo());
    }
    else if(!strcmp(type, "maxT")) {
       strcpy(fullName, "Maksymalne tempo: ");
@@ -175,6 +171,7 @@ void statsWindow (char *fileName) {
    if(!pathParse(fileName)) {
       GtkWidget *statsWindow;
       GtkWidget *mainBox;
+      GtkWidget *separator;
       GtkWidget *statsBox;
       GtkWidget *drawingArea;
       GtkWidget *dateText;
@@ -189,7 +186,6 @@ void statsWindow (char *fileName) {
       GtkWidget *minHText;
       GtkWidget *maxHText;
       GtkWidget *difHText;
-      GtkWidget *buttonBox;
       GtkWidget *closeButton;
 
       statsWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -204,6 +200,9 @@ void statsWindow (char *fileName) {
 
       statsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
       gtk_box_pack_start(GTK_BOX(mainBox), statsBox, FALSE, TRUE, 0);
+
+      separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+      gtk_box_pack_start(GTK_BOX(mainBox), separator, FALSE, TRUE, 0);
 
       drawingArea = gtk_drawing_area_new();
       gtk_box_pack_start(GTK_BOX(mainBox), drawingArea, TRUE, TRUE, 0);
@@ -243,15 +242,11 @@ void statsWindow (char *fileName) {
       /* ROZNICA WYSOKOSCI */
       difHText = gtk_label_new(makeLabelName("difH"));
       gtk_box_pack_start(GTK_BOX(statsBox), difHText, TRUE, TRUE, 0);
-
-      buttonBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-      gtk_box_set_homogeneous(GTK_BOX(buttonBox), TRUE);
-      gtk_widget_set_margin_start(buttonBox, 50);
-      gtk_widget_set_margin_end(buttonBox, 50);
-      gtk_box_pack_start(GTK_BOX(statsBox), buttonBox, FALSE, TRUE, 0);
       /* PRZYCISK ZAMKNIJ */
       closeButton = gtk_button_new_with_label("Zamknij");
-      gtk_box_pack_start(GTK_BOX(buttonBox), closeButton, FALSE, TRUE, 0);
+      gtk_widget_set_margin_start(closeButton, 30);
+      gtk_widget_set_margin_end(closeButton, 30);
+      gtk_box_pack_start(GTK_BOX(statsBox), closeButton, TRUE, TRUE, 0);
 
       drawingAreaSetup(drawingArea);
       g_signal_connect(G_OBJECT(drawingArea), "draw", G_CALLBACK(onDrawEvent), NULL); 
@@ -276,14 +271,15 @@ void helpWindow () {
    GtkWidget *closeButton;
 
    helpWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+   gtk_window_set_position(GTK_WINDOW(helpWindow), GTK_WIN_POS_CENTER);
    gtk_window_set_title(GTK_WINDOW(helpWindow), "Pomoc");
-   gtk_window_set_default_size(GTK_WINDOW(helpWindow), 300, 180);
+   gtk_window_set_default_size(GTK_WINDOW(helpWindow), 400, 280);
    gtk_container_set_border_width(GTK_CONTAINER(helpWindow), 10);
 
    mainBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
    gtk_container_add(GTK_CONTAINER(helpWindow), mainBox);
    /* TEKST POMOCY */
-   help = gtk_label_new("Lorem ipsum – tekst skladajacy sie z lacinskichi quasi-lacinskich\nwyrazow, majacy korzenie w klasycznej lacinie, wzorowany na fragmencie\ntraktatu Cycerona „O granicach dobra i zla” (De finibus bonorum\net malorum) napisanego w 45 p.n.e. Tekst jest stosowany do demonstracji\nkrojow pisma (czcionek, fontow), kompozycji kolumny itp. Po raz pierwszy\nzostal uzyty przez nieznanego drukarza w XVI wieku.");
+   help = gtk_label_new("POMOC");
    gtk_box_pack_start(GTK_BOX(mainBox), help, TRUE, TRUE, 0);
    /* PRZYCISK ZAMKNIJ */
    closeButton = gtk_button_new_with_label("Zamknij");
@@ -355,6 +351,8 @@ void mainMenu () {
    gtk_entry_set_max_length(GTK_ENTRY(entry), 50);
    gtk_entry_set_text(GTK_ENTRY(entry), "Wprowadz tekst");
    gtk_editable_select_region(GTK_EDITABLE(entry), 0, gtk_entry_get_text_length(GTK_ENTRY(entry)));
+   g_signal_connect_swapped(entry, "activate", G_CALLBACK(statsWindow), (gpointer) gtk_entry_get_text(GTK_ENTRY(entry)));
+   g_signal_connect(entry, "activate", G_CALLBACK(setEntry), (gpointer) entry);
    gtk_box_pack_start(GTK_BOX(fileSelectionBox), entry, TRUE, TRUE, 0);
    /* PRZYCISK OTWIERAJĄCY DIALOG WYBORU PLIKU */
    browseButton = gtk_button_new_with_label("...");
