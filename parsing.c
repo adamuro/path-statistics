@@ -1,13 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <expat.h>
-#include <gtk/gtk.h>
-#include <stdbool.h>
-#include "structures.h"
-#include "display.h"
-#include "calculations.h"
-#define BUFF_SIZE 500000
+#include "parsing.h"
 
 static int depth = 0;
 /*
@@ -21,6 +12,7 @@ void pathFree () {
     free(path -> point);
     free(path -> date);
     free(path -> height);
+    free(path);
 }
 
 /*

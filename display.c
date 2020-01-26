@@ -1,10 +1,5 @@
-#include <gtk/gtk.h>
-#include <string.h>
-#include <cairo.h>
-#include <math.h>
-#include "parsing.h"
-#include "calculations.h"
-#include "draw.h"
+#include "display.h"
+
 /*
  *  INFORMACJA O NIEODNALEZIENIU DANEGO PLIKU
  */

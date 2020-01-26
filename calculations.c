@@ -1,15 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <stdbool.h>
-#include "structures.h"
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-#ifndef R
-#define R 6371
-#endif
+#include "calculations.h"
 
 /* Standardowy atof nie działa */
 double atofC (const char *str) {

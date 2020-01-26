@@ -1,0 +1,12 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+#include <stdbool.h>
+#include <gtk/gtk.h>
+#include <expat.h>
+#include "structures.h"
+#include "calculations.h"
+#include "parsing.h"
+#include "display.h"
+#include "draw.h"

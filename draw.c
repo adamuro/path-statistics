@@ -1,14 +1,4 @@
-#include <cairo.h>
-#include <gtk/gtk.h>
-#include "structures.h"
-#include "parsing.h"
-#include "calculations.h"
-#ifndef MapWidth
-#define MapWidth 450
-#endif
-#ifndef MapHeight
-#define MapHeight 300
-#endif
+#include "draw.h"
 /*
  *  PRZYGOTOWANIE OBSZARU DO RYSOWANIA
  */

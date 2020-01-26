@@ -1,10 +1,6 @@
-#include <gtk/gtk.h>
-#include "display.h"
-#include "parsing.h"
+#include "common.h"
 
 int main (int argc, char **argv) {
-   pathInit();
-
    gtk_init(&argc, &argv);
    
    mainMenu();
@@ -12,7 +8,6 @@ int main (int argc, char **argv) {
    gtk_main();
 
    pathFree();
-   free(path);
 
   return 0;
 }
