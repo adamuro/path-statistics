@@ -1,116 +1,94 @@
 #include "calculations.h"
 
-/* Standardowy atof nie działa */
-double atofC (const char *str) {
-	double coord = 0;
-	double div = 10;
+double atofC (const char *Str) {
+	double Number = 0;
+	double Div = 10;
 	int i;
-	for(i = 0 ; str[i] != '.' ; i++) {
-		coord *= 10;
-		coord += str[i] - 48;
+	for(i = 0 ; Str[i] != '.' ; i++) {
+		Number *= 10;
+		Number += Str[i] - 48;
 	}
-	while(++i < strlen(str)) {
-		coord += ((double)str[i] - 48) / div;
-		div *= 10;
+	while(++i < strlen(Str)) {
+		Number += ((double)Str[i] - 48) / Div;
+		Div *= 10;
 	}
-	return coord;
+	return Number;
 }
-/*
- *	ODLEGŁOŚĆ MIĘDZY DWOMA PUNKTAMI
- */
+
 double singleDistance (Pt p1, Pt p2) {
-    double dist = 6371.0 * acos(sin(p1.lat / 180.0 * M_PI) * sin(p2.lat / 180.0 * M_PI) +
+    double Dist = 6371.0 * acos(sin(p1.lat / 180.0 * M_PI) * sin(p2.lat / 180.0 * M_PI) +
         cos(p1.lat / 180.0 * M_PI) * cos(p2.lat / 180.0 * M_PI) *
         cos(p1.lon / 180.0 * M_PI - p2.lon / 180.0 * M_PI));
-    if(!isnan(dist)) {
-    	//printf("%lf %lf %lf\n", p1.lat, p1.lon, dist);
-    	return dist;
+    if(!isnan(Dist)) {
+    	return Dist;
     }
     return 0;
 }
-/*
- *  DYSTANS CAŁEJ TRASY
- */
+
 double fullDistance () {
     double fullDist = 0;
-    for(int i = 1 ; i < path -> pointsNum ; i++) {
-        fullDist += singleDistance(path -> point[i - 1], path -> point[i]);
-        //printf("%lf\n", fullDist);
+    for(int i = 1 ; i < Path -> pointsNum ; i++) {
+        fullDist += singleDistance(Path -> Point[i - 1], Path -> Point[i]);
     }
-    //printf("full dist: %lf\n", fullDist);
     return fullDist;
 }
-/*
- *	NAJNIŻSZY PUNKT
- */
+
 double minHeight () {
-	double minH = path -> height[0];
-	for(int i = 1 ; i < path -> hNum ; i++) {
-		if(path -> height[i] < minH)
-			minH = path -> height[i];
+	double minH = Path -> Height[0];
+	for(int i = 1 ; i < Path -> hNum ; i++) {
+		if(Path -> Height[i] < minH)
+			minH = Path -> Height[i];
 	}
 	return minH;
 }
-/*
- *  NAJWYŻSZY PUNKT
- */
+
 double maxHeight () {
-	double maxH = path -> height[0];
-	for(int i = 1 ; i < path -> hNum ; i++) {
-		if(path -> height[i] > maxH)
-			maxH = path -> height[i];
+	double maxH = Path -> Height[0];
+	for(int i = 1 ; i < Path -> hNum ; i++) {
+		if(Path -> Height[i] > maxH)
+			maxH = Path -> Height[i];
 	}
 	return maxH;
 }
-/*
- *  RÓŻNICA MIĘDZY NAJWYŻSZYM I NAJNIŻSZYM PUNKTEM
- */
+
 double heightDif () {
-    return maxHeight(path) - minHeight(path);
+    return maxHeight(Path) - minHeight(Path);
 }
-/*
- *	ODCZYTANIE POJEDYNCZEJ DATY Z PLIKU GPX
- */
-void getDate (PtDate *date, int dateNum, char *dateStr) {
+
+void getDate (PtDate *Date, int dateNum, char *dateStr) {
 	char dateMember[4];
 	strncpy(dateMember, dateStr, 4);
-	date[dateNum].year = atoi(dateMember);
+	Date[dateNum].year = atoi(dateMember);
 	dateMember[2] = dateMember[3] = '\0';
 	strncpy(dateMember, dateStr + 5, 2);
-	date[dateNum].month = atoi(dateMember);
+	Date[dateNum].month = atoi(dateMember);
 	strncpy(dateMember, dateStr + 8, 2);
-	date[dateNum].day = atoi(dateMember);
+	Date[dateNum].day = atoi(dateMember);
 	strncpy(dateMember, dateStr + 11, 2);
-	date[dateNum].hour = atoi(dateMember);
+	Date[dateNum].hour = atoi(dateMember);
 	strncpy(dateMember, dateStr + 14, 2);
-	date[dateNum].minute = atoi(dateMember);
+	Date[dateNum].minute = atoi(dateMember);
 	strncpy(dateMember, dateStr + 17, 2);
-	date[dateNum].second = atoi(dateMember);
+	Date[dateNum].second = atoi(dateMember);
 }
-/*
- *  CZY ROK JEST PRZESTĘPNY
- */
-bool leapYear (int year) {
-	if((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)
+
+bool leapYear (int Year) {
+	if((Year % 4 == 0 && Year % 100 != 0) || Year % 400 == 0)
 		return 1;
 	return 0;
 }
-/*
- *  LICZBA DNI OD POCZĄTKU ROKU DO MIESIĄCA
- */
-int daysTillMonth (PtDate date) {
+
+int daysTillMonth (PtDate Date) {
 	int daysNum[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	int days = 0;
-	if(leapYear(date.year))
+	int Days = 0;
+	if(leapYear(Date.year))
 		daysNum[1]++;
-	for(int i = 0 ; i < date.month ; i++) {
-		days += daysNum[i];
+	for(int i = 0 ; i < Date.month ; i++) {
+		Days += daysNum[i];
 	}
-	return days;
+	return Days;
 }
-/*
- * ROZNICA CZASU MIĘDZY DWOMA PUNKTAMI W SEKUNDACH
- */
+
 long long timeDifference (PtDate startDate, PtDate endDate) {
 	long long timeDifference = 0;
 	for(int i = startDate.year ; i < endDate.year ; i++)
@@ -123,139 +101,92 @@ long long timeDifference (PtDate startDate, PtDate endDate) {
 				startDate.minute * 60 + startDate.second;
 	return timeDifference;
 }
-/*
- *  CZAS TRWANIA TRASY
- */
-long long pathDuration () {
-	return timeDifference(path -> date[0], path -> date[path -> dateNum - 1]);
+
+long long PathDuration () {
+	return timeDifference(Path -> Date[0], Path -> Date[Path -> dateNum - 1]);
 }
-/*
- *  PRĘDKOŚĆ MIĘDZY DWOMA PUNKTAMI
- */
+
 double singleSpeed (int startPointIndex, int endPointIndex) {
-	return singleDistance(path -> point[startPointIndex], path -> point[endPointIndex])
-		/ ((double)timeDifference(path -> date[startPointIndex], path -> date[endPointIndex]) / 3600);
+	return singleDistance(Path -> Point[startPointIndex], Path -> Point[endPointIndex])
+		/ ((double)timeDifference(Path -> Date[startPointIndex], Path -> Date[endPointIndex]) / 3600);
 }
-/*
- *  ŚREDNIA PRĘDKOŚĆ
- */
+
 double averageSpeed () {
-	return fullDistance() / ((double)pathDuration() / 3600);
+	return fullDistance() / ((double)PathDuration() / 3600);
 }
-/*
- *  NAJWYŻSZA PRĘDKOŚĆ
- */
+
 double maxSpeed () {
 	double maxSpeed = 0;
 	double tempSpeed;
-/*	double tempDist;
-	double tempTime;
-	double tempSpeed;
 
-	for(int i = 3 ; i < path -> pointsNum ; i++) {
-		tempDist = 0;
-		tempTime = timeDifference(path -> date[i - 3], path -> date[i]);
-		for(int j = 3 ; j > 0 ; j--) {
-			tempDist += singleDistance(path -> point[i - j], path -> point[i - j + 1]);
-		}
-		tempSpeed = tempDist / (tempTime / 3600);
-		if(tempSpeed > maxSpeed)
-			maxSpeed = tempSpeed;
-	}
-	return maxSpeed;
-	*/
-	//printf("%d %d %d\n", path -> pointsNum, path -> hNum, path -> dateNum);
-	for(int i = 1 ; i < path -> pointsNum ; i++) {
-		//printf("1. single dist. %lf\n", singleDistance(path -> point[i - 1], path -> point[i]));
-		//printf("2. time dif. %lf\n", (double)timeDifference(path -> date[i - 1], path -> date[i]) / 3600);
-		//printf("3. date %d %d %d\n", path -> date[i].hour, path -> date[i].minute, path -> date[i].second);
-		tempSpeed = singleDistance(path -> point[i - 1], path -> point[i])
-			/ ((double)timeDifference(path -> date[i - 1], path -> date[i]) / 3600);
+	for(int i = 1 ; i < Path -> pointsNum ; i++) {
+		tempSpeed = singleDistance(Path -> Point[i - 1], Path -> Point[i])
+			/ ((double)timeDifference(Path -> Date[i - 1], Path -> Date[i]) / 3600);
 		if(tempSpeed > maxSpeed && tempSpeed != INFINITY)
 			maxSpeed = tempSpeed;
-		//printf("4. max v %lf\n", maxSpeed);
 	}
-	//printf(". max v %lf\n", maxSpeed);
 	return maxSpeed;
 }
-/*
- *  NAJNIŻSZA PRĘDKOŚĆ
- */
+
 double minSpeed () {
-	double minSpeed = singleDistance(path -> point[0], path -> point[1])
-			/ ((double)timeDifference(path -> date[0], path -> date[1]) / 3600);
 	double tempSpeed;
-	for(int i = 2 ; i < path -> pointsNum ; i++) {
-		tempSpeed = singleDistance(path -> point[i - 1], path -> point[i])
-			/ ((double)timeDifference(path -> date[i - 1], path -> date[i]) / 3600);
-		if(tempSpeed < minSpeed && tempSpeed != INFINITY && tempSpeed != 0)
+	double minSpeed = singleDistance(Path -> Point[0], Path -> Point[1])
+			/ ((double)timeDifference(Path -> Date[0], Path -> Date[1]) / 3600);
+
+	for(int i = 2 ; i < Path -> pointsNum ; i++) {
+		tempSpeed = singleDistance(Path -> Point[i - 1], Path -> Point[i])
+			/ ((double)timeDifference(Path -> Date[i - 1], Path -> Date[i]) / 3600);
+		if(tempSpeed < minSpeed && tempSpeed != INFINITY && tempSpeed > 0)
 			minSpeed = tempSpeed;
 	}
 	return minSpeed;
 }
-/*
- *  NAJWYŻSZE TEMPO
- */
+
 double maxTempo () {
 	return 1 / maxSpeed() * 60;
 }
-/*
- *  NAJNIŻSZE TEMPO
- */
+
 double minTempo () {
 	return 1 / minSpeed() * 60;
 }
-/*
- *  ŚREDNIE TEMPO
- */
+
 double averageTempo () {
 	return 1 / averageSpeed() * 60;
 }
 
-double convertToCartesianX (Pt point) {
-	return R * cos(point.lat * M_PI * 2.0 / 360.0) * cos(point.lon * M_PI * 2.0 / 360.0);
+double convertToCartesianX (Pt Point) {
+	return R * cos(Point.lat * M_PI * 2.0 / 360.0) * cos(Point.lon * M_PI * 2.0 / 360.0);
 }
 
-double convertToCartesianY (Pt point) {
-	return R * cos(point.lat * M_PI * 2.0 / 360.0) * sin(point.lon * M_PI * 2.0 / 360.0);
+double convertToCartesianY (Pt Point) {
+	return R * cos(Point.lat * M_PI * 2.0 / 360.0) * sin(Point.lon * M_PI * 2.0 / 360.0);
 }
 
-double minCartesianX (Pt *point, int pointsNum) {
-	double minCartesianX = convertToCartesianX(point[0]);
+void cartesianMinimums (double *minCartesianX, double *minCartesianY, Pt *Point, int pointsNum) {
+	*minCartesianX = convertToCartesianX(Point[0]);
+	*minCartesianY = convertToCartesianY(Point[0]);
+
 	for(int i = 1 ; i < pointsNum ; i++) {
-		int cartesian = convertToCartesianX(point[i]);
-		if(cartesian < minCartesianX)
-			minCartesianX = cartesian;
+		double cartesianX = convertToCartesianX(Point[i]);
+		double cartesianY = convertToCartesianY(Point[i]);
+		if(cartesianX < *minCartesianX)
+			*minCartesianX = cartesianX;
+		if(cartesianY < *minCartesianY)
+			*minCartesianY = cartesianY;
 	}
-	return minCartesianX;
 }
 
-double minCartesianY (Pt *point, int pointsNum) {
-	double minCartesianY = convertToCartesianY(point[0]);
+void cartesianDiffs (double minX, double minY, double *difX, double *difY, Pt *Point, int pointsNum) {
+	double maxCartesianX = convertToCartesianX(Point[0]);
+	double maxCartesianY = convertToCartesianY(Point[0]);
 	for(int i = 1 ; i < pointsNum ; i++) {
-		int cartesian = convertToCartesianY(point[i]);
-		if(cartesian < minCartesianY)
-			minCartesianY = cartesian;
+		double cartesianX = convertToCartesianX(Point[i]);
+		if(cartesianX > maxCartesianX)
+			maxCartesianX = cartesianX;
+		double cartesianY = convertToCartesianY(Point[i]);
+		if(cartesianY > maxCartesianY)
+			maxCartesianY = cartesianY;
 	}
-	return minCartesianY;
-}
-
-double cartesianDifX (Pt *point, int pointsNum) {
-	double maxCartesianX = convertToCartesianX(point[0]);
-	for(int i = 1 ; i < pointsNum ; i++) {
-		int cartesian = convertToCartesianX(point[i]);
-		if(cartesian > maxCartesianX)
-			maxCartesianX = cartesian;
-	}
-	return maxCartesianX - minCartesianX(point, pointsNum);
-}
-
-double cartesianDifY (Pt *point, int pointsNum) {
-	double maxCartesianY = convertToCartesianY(point[0]);
-	for(int i = 1 ; i < pointsNum ; i++) {
-		int cartesian = convertToCartesianY(point[i]);
-		if(cartesian > maxCartesianY)
-			maxCartesianY = cartesian;
-	}
-	return maxCartesianY - minCartesianY(point, pointsNum);
+	*difX = maxCartesianX - minX;
+	*difY = maxCartesianY - minY;
 }

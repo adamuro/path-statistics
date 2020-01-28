@@ -5,14 +5,11 @@
 
 #include "common.h"
 
-void pathInit ();
-
-void pathFree ();
-
-void start_element (void *data, const char *element, const char **attribute);
-
-void end_element (void *data, const char *el);
-
-bool pathParse (const char *fileName);
+void pathInit (); // Allocate memory for path and fill it with zeros
+void pathFree (); // Free the allocated mamory
+void startElement (void *Data, const char *Element, const char **Attribute); // Find geographic coordinates in the GPX file
+void endElement (void *Data, const char *Elelement);
+void Handler(void *Data, const char *Object, int Length); // Find dates and heights in the GPX file
+bool PathParse (const char *fileName); // Check if given file exists, set up a parser and read needed informations
 
 #endif

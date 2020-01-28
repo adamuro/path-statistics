@@ -1,7 +1,5 @@
 #include "draw.h"
-/*
- *  PRZYGOTOWANIE OBSZARU DO RYSOWANIA
- */
+
 void drawingAreaSetup (GtkWidget *drawingArea) {        
    GdkScreen *Screen;
    GdkVisual *Visual;
@@ -13,30 +11,27 @@ void drawingAreaSetup (GtkWidget *drawingArea) {
       gtk_widget_set_visual(drawingArea, Visual);
    }
 }
-/*
- *  RYSOWANIE MAPY
- */
-void doDrawing (cairo_t *cr) {
-   double difX = cartesianDifX(path -> point, path -> pointsNum);
-   double difY = cartesianDifY(path -> point, path -> pointsNum);
-   double minX = minCartesianX(path -> point, path -> pointsNum);
-   double minY = minCartesianY(path -> point, path -> pointsNum);
-   
-   for (int i = 0 ; i < path -> pointsNum - 1 ; i++) {
-      cairo_move_to(cr, (convertToCartesianX(path -> point[i]) - minX) * (MapWidth / difX),
-         (convertToCartesianY(path -> point[i]) - minY) * (MapHeight / difY));
-      cairo_line_to(cr, (convertToCartesianX(path -> point[i + 1]) - minX) * (MapWidth / difX),
-         (convertToCartesianY(path -> point[i + 1]) - minY) * (MapHeight / difY));
-      //printf("%lf %lf\n", convertToCartesianX(path -> point[i]), convertToCartesianY(path -> point[i]));
-   }
 
-   cairo_stroke(cr);
+void doDrawing (cairo_t *drawingArea) {
+   double difX;
+   double difY;
+   double minX;
+   double minY;
+
+   cartesianMinimums(&minX, &minY, Path -> Point, Path -> pointsNum);
+   cartesianDiffs(minX, minY, &difX, &difY, Path -> Point, Path -> pointsNum);
+   
+   for (int i = 0 ; i < Path -> pointsNum - 1 ; i++) {
+      cairo_move_to(drawingArea, (convertToCartesianX(Path -> Point[i]) - minX) * (MapWidth / difX) + 10,
+         (convertToCartesianY(Path -> Point[i]) - minY) * (MapHeight / difY) + 10);
+      cairo_line_to(drawingArea, (convertToCartesianX(Path -> Point[i + 1]) - minX) * (MapWidth / difX) + 10,
+         (convertToCartesianY(Path -> Point[i + 1]) - minY) * (MapHeight / difY) + 10);
+   }
+   cairo_stroke(drawingArea);
 }
-/*
- *  FUNKCJA POŚREDNIA RYSOWANIA
- */
-gboolean onDrawEvent (GtkWidget *widget, cairo_t *cr, gpointer user_data) {
-   doDrawing(cr);
-   return FALSE;
+
+gboolean onDrawEvent (GtkWidget *Widget, cairo_t *drawingArea, gpointer userData) {
+   doDrawing(drawingArea);
+   return TRUE;
 }
 

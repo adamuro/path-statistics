@@ -1,8 +1,5 @@
 #include "display.h"
 
-/*
- *  INFORMACJA O NIEODNALEZIENIU DANEGO PLIKU
- */
 void fileOpenError () {
    GtkWidget *errorWindow;
    GtkWidget *mainBox;
@@ -33,49 +30,47 @@ void fileOpenError () {
 
    gtk_widget_show_all(errorWindow);
 }
-/*
- *  TWORZENIE INFORMACJI O DANEJ STATYSTYCE
- */
+
 char* makeLabelName (char *type) {
    char namePart[16];
    static char fullName[32];
    if(!strcmp(type, "date")) {
       strcpy(fullName, "Data: ");
-      g_snprintf(namePart, 17, "%d", path -> date[0].day);
-      if(path -> date[0].day < 10)
+      g_snprintf(namePart, 16, "%d", Path -> Date[0].day);
+      if(Path -> Date[0].day < 10)
          strcat(fullName, "0");
       strcat(fullName, namePart);
       strcat(fullName, ".");
-      g_snprintf(namePart, 17, "%d", path -> date[0].month);
-      if(path -> date[0].month < 10)
+      g_snprintf(namePart, 16, "%d", Path -> Date[0].month);
+      if(Path -> Date[0].month < 10)
          strcat(fullName, "0");
       strcat(fullName, namePart);
       strcat(fullName, ".");
-      g_snprintf(namePart, 17, "%d", path -> date[0].year);
+      g_snprintf(namePart, 16, "%d", Path -> Date[0].year);
       strcat(fullName, namePart);
    }
    else if(!strcmp(type, "time")) {
       strcpy(fullName, "Czas: ");
-      if(pathDuration() / 3600 > 0) {
-         if(pathDuration() / 3600 < 10)
+      if(PathDuration() / 3600 > 0) {
+         if(PathDuration() / 3600 < 10)
             strcat(fullName, "0");
-         g_snprintf(namePart, 17, "%lld", pathDuration() / 3600);
+         g_snprintf(namePart, 16, "%lld", PathDuration() / 3600);
          strcat(fullName, namePart);
          strcat(fullName, ":");
       }
-      if((pathDuration() % 3600) / 60 < 10)
+      if((PathDuration() % 3600) / 60 < 10)
          strcat(fullName, "0");
-      g_snprintf(namePart, 17, "%lld", (pathDuration() % 3600) / 60);
+      g_snprintf(namePart, 16, "%lld", (PathDuration() % 3600) / 60);
       strcat(fullName, namePart);
       strcat(fullName, ":");
-      if(pathDuration() % 60 < 10)
+      if(PathDuration() % 60 < 10)
          strcat(fullName, "0");
-      g_snprintf(namePart, 17, "%lld", pathDuration() % 60);
+      g_snprintf(namePart, 16, "%lld", PathDuration() % 60);
       strcat(fullName, namePart);
    }
    else if(!strcmp(type, "dist")) {
       strcpy(fullName, "Dlugosc trasy: ");
-      g_snprintf(namePart, 17, "%.2lf", fullDistance());
+      g_snprintf(namePart, 16, "%.2lf", fullDistance());
       strcat(fullName, namePart);
       strcat(fullName, " km");
    }
@@ -86,13 +81,13 @@ char* makeLabelName (char *type) {
       strcat(fullName, " km/h");
    }
    else if(!strcmp(type, "maxV")) {
-      strcpy(fullName, "Maksymalna predkosc: ");
+      strcpy(fullName, "Najwyzsza predkosc: ");
       g_snprintf(namePart, 16, "%.2lf", maxSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
    }
    else if(!strcmp(type, "minV")) {
-      strcpy(fullName, "Minimalna predkosc: ");
+      strcpy(fullName, "Najnizsza predkosc: ");
       g_snprintf(namePart, 16, "%.2lf", minSpeed());
       strcat(fullName, namePart);
       strcat(fullName, " km/h");
@@ -102,9 +97,9 @@ char* makeLabelName (char *type) {
       g_snprintf(namePart, 16, "%d", (int)averageTempo());
       strcat(fullName, namePart);
       strcat(fullName, ":");
-      double decimalPart, seconds;
-      decimalPart = modf(averageTempo(), &seconds);
-      seconds = (int)(decimalPart * 60);
+      double decimalPart, seconds;                  // 
+      decimalPart = modf(averageTempo(), &seconds); // Calculate number of seconds
+      seconds = (int)(decimalPart * 60);            //
       if(seconds < 10)
          strcat(fullName, "0");
       g_snprintf(namePart, 16, "%.0lf", seconds);
@@ -112,7 +107,7 @@ char* makeLabelName (char *type) {
       strcat(fullName, " min/km");
    }
    else if(!strcmp(type, "maxT")) {
-      strcpy(fullName, "Maksymalne tempo: ");
+      strcpy(fullName, "Najwyzsze tempo: ");
       g_snprintf(namePart, 16, "%d", (int)maxTempo());
       strcat(fullName, namePart);
       strcat(fullName, ":");
@@ -126,7 +121,7 @@ char* makeLabelName (char *type) {
       strcat(fullName, " min/km");
    }
    else if(!strcmp(type, "minT")) {
-      strcpy(fullName, "Minimalne tempo: ");
+      strcpy(fullName, "Najnizsze tempo: ");
       g_snprintf(namePart, 16, "%d", (int)minTempo());
       strcat(fullName, namePart);
       strcat(fullName, ":");
@@ -159,14 +154,12 @@ char* makeLabelName (char *type) {
    }
    return fullName;
 }
-/*
- *  OKNO ZE STATYSTYKAMI
- */
+
 void statsWindow (char *fileName) {
-   if(!pathParse(fileName)) {
+   if(PathParse(fileName)) {
       GtkWidget *statsWindow;
       GtkWidget *mainBox;
-      GtkWidget *separator;
+      GtkWidget *Separator;
       GtkWidget *statsBox;
       GtkWidget *drawingArea;
       GtkWidget *dateText;
@@ -196,48 +189,48 @@ void statsWindow (char *fileName) {
       statsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
       gtk_box_pack_start(GTK_BOX(mainBox), statsBox, FALSE, TRUE, 0);
 
-      separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
-      gtk_box_pack_start(GTK_BOX(mainBox), separator, FALSE, TRUE, 0);
+      Separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+      gtk_box_pack_start(GTK_BOX(mainBox), Separator, FALSE, TRUE, 0);
 
       drawingArea = gtk_drawing_area_new();
       gtk_box_pack_start(GTK_BOX(mainBox), drawingArea, TRUE, TRUE, 0);
-      /* DATA */
+      /* DATE */
       dateText = gtk_label_new(makeLabelName("date"));
       gtk_box_pack_start(GTK_BOX(statsBox), dateText, TRUE, TRUE, 0);
-      /* CZAS */
+      /* PATH DURATION */
       timeText = gtk_label_new(makeLabelName("time"));
       gtk_box_pack_start(GTK_BOX(statsBox), timeText, TRUE, TRUE, 0);
-      /* ŁĄCZNY DYSTANS */
+      /* FULL DISTANCE */
       distanceText = gtk_label_new(makeLabelName("dist"));
       gtk_box_pack_start(GTK_BOX(statsBox), distanceText, TRUE, TRUE, 0);
-      /* ŚREDNIA PRĘDKOŚĆ */
+      /* AVERAGE SPEED */
       avgSpeedText = gtk_label_new(makeLabelName("avgV"));
       gtk_box_pack_start(GTK_BOX(statsBox), avgSpeedText, TRUE, TRUE, 0);
-      /* NAJWYŻSZA PRĘDKOŚĆ */
+      /* HIGHEST SPEED */
       maxSpeedText = gtk_label_new(makeLabelName("maxV"));
       gtk_box_pack_start(GTK_BOX(statsBox), maxSpeedText, TRUE, TRUE, 0);
-      /* NAJNIŻSZA PRĘDKOŚĆ */
+      /* LOWEST SPEED */
       minSpeedText = gtk_label_new(makeLabelName("minV"));
       gtk_box_pack_start(GTK_BOX(statsBox), minSpeedText, TRUE, TRUE, 0);
-      /* ŚREDNIE TEMPO */
+      /* AVERAGE TEMPO */
       avgTempoText = gtk_label_new(makeLabelName("avgT"));
       gtk_box_pack_start(GTK_BOX(statsBox), avgTempoText, TRUE, TRUE, 0);
-      /* NAJWYŻSZE TEMPO */
+      /* HIGHEST TEMPO */
       maxTempoText = gtk_label_new(makeLabelName("maxT"));
       gtk_box_pack_start(GTK_BOX(statsBox), maxTempoText, TRUE, TRUE, 0);
-      /* NAJNIŻSZE TEMPO */
+      /* LOWEST TEMPO */
       minTempoText = gtk_label_new(makeLabelName("minT"));
       gtk_box_pack_start(GTK_BOX(statsBox), minTempoText, TRUE, TRUE, 0);
-      /* NAJNIŻSZY PUNKT */
+      /* LOWEST LOCATED POINT */
       minHText = gtk_label_new(makeLabelName("minH"));
       gtk_box_pack_start(GTK_BOX(statsBox), minHText, TRUE, TRUE, 0);
-      /* NAJWYŻSZY PUNKT */
+      /* HIGHEST LOCATED POINT */
       maxHText = gtk_label_new(makeLabelName("maxH"));
       gtk_box_pack_start(GTK_BOX(statsBox), maxHText, TRUE, TRUE, 0);
-      /* ROZNICA WYSOKOSCI */
+      /* HEIGHT DIFFERENCE */
       difHText = gtk_label_new(makeLabelName("difH"));
       gtk_box_pack_start(GTK_BOX(statsBox), difHText, TRUE, TRUE, 0);
-      /* PRZYCISK ZAMKNIJ */
+
       closeButton = gtk_button_new_with_label("Zamknij");
       gtk_widget_set_margin_start(closeButton, 30);
       gtk_widget_set_margin_end(closeButton, 30);
@@ -249,7 +242,8 @@ void statsWindow (char *fileName) {
       g_signal_connect(closeButton, "clicked", G_CALLBACK(gtk_window_close), statsWindow);
 
       g_signal_connect(statsWindow, "destroy", G_CALLBACK(gtk_widget_destroy), statsWindow);
-      //g_signal_connect(statsWindow, "destroy", G_CALLBACK(pathFree), statsWindow);
+
+      gtk_widget_show(statsWindow);
 
       gtk_widget_show_all(statsWindow);
    }
@@ -262,7 +256,7 @@ void statsWindow (char *fileName) {
 void helpWindow () {
    GtkWidget *helpWindow;
    GtkWidget *mainBox;
-   GtkWidget *help;
+   GtkWidget *Help;
    GtkWidget *closeButton;
 
    helpWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -273,10 +267,10 @@ void helpWindow () {
 
    mainBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
    gtk_container_add(GTK_CONTAINER(helpWindow), mainBox);
-   /* TEKST POMOCY */
-   help = gtk_label_new("POMOC");
-   gtk_box_pack_start(GTK_BOX(mainBox), help, TRUE, TRUE, 0);
-   /* PRZYCISK ZAMKNIJ */
+   /* HELP TEXT */
+   Help = gtk_label_new("POMOC");
+   gtk_box_pack_start(GTK_BOX(mainBox), Help, TRUE, TRUE, 0);
+
    closeButton = gtk_button_new_with_label("Zamknij");
    gtk_widget_set_margin_start(closeButton, 150);
    gtk_widget_set_margin_end(closeButton, 150);
@@ -288,27 +282,27 @@ void helpWindow () {
 
    gtk_widget_show_all(helpWindow);
 }
-/*
- *  USTAWIANIE POLA TEKSTOWEGO
- */
-void setEntry (GtkWidget *widget, GtkWidget *entry) {
-   gtk_editable_select_region(GTK_EDITABLE(entry), 0, gtk_entry_get_text_length(GTK_ENTRY(entry)));
-   gtk_widget_grab_focus(entry);
+
+void setEntry (GtkWidget *Widget, GtkWidget *Entry) {
+   gtk_editable_select_region(GTK_EDITABLE(Entry), 0, gtk_entry_get_text_length(GTK_ENTRY(Entry)));
+   gtk_widget_grab_focus(Entry);
 }
-/*
- *  DIALOG WYBORU PLIKU
- */
+
 void fileSelection () {
    GtkWidget *fileSelectionDialog;
+
    fileSelectionDialog = gtk_file_chooser_dialog_new("Wybierz plik", NULL, 
       GTK_FILE_CHOOSER_ACTION_OPEN, "Wybierz", GTK_RESPONSE_OK, 
       "Anuluj", GTK_RESPONSE_CANCEL, NULL);
-   gtk_widget_show_all(fileSelectionDialog);
-   gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(fileSelectionDialog),
-      g_get_home_dir());
+
+   gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(fileSelectionDialog), g_get_home_dir());
+   /* IF A FILE IS SELECTED, READ ITS NAME */
    gint Respnse = gtk_dialog_run(GTK_DIALOG(fileSelectionDialog));
    if(Respnse == GTK_RESPONSE_OK)
       statsWindow((gpointer) gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(fileSelectionDialog)));
+
+   gtk_widget_show_all(fileSelectionDialog);
+
    gtk_widget_destroy(fileSelectionDialog);
 }
 
@@ -319,7 +313,7 @@ void mainMenu () {
    GtkWidget *mainMenu;
    GtkWidget *mainBox;
    GtkWidget *fileSelectionBox;
-   GtkWidget *entry;
+   GtkWidget *Entry;
    GtkWidget *browseButton;
    GtkWidget *buttonBox;
    GtkWidget *confirmButton;
@@ -341,15 +335,15 @@ void mainMenu () {
 
    fileSelectionBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
    gtk_box_pack_start(GTK_BOX(mainBox), fileSelectionBox, TRUE, TRUE, 0);
-   /* WPROWADZANIE SCIEZKI DO PLIKU */
-   entry = gtk_entry_new();
-   gtk_entry_set_max_length(GTK_ENTRY(entry), 50);
-   gtk_entry_set_text(GTK_ENTRY(entry), "Wprowadz tekst");
-   gtk_editable_select_region(GTK_EDITABLE(entry), 0, gtk_entry_get_text_length(GTK_ENTRY(entry)));
-   g_signal_connect_swapped(entry, "activate", G_CALLBACK(statsWindow), (gpointer) gtk_entry_get_text(GTK_ENTRY(entry)));
-   g_signal_connect(entry, "activate", G_CALLBACK(setEntry), (gpointer) entry);
-   gtk_box_pack_start(GTK_BOX(fileSelectionBox), entry, TRUE, TRUE, 0);
-   /* PRZYCISK OTWIERAJĄCY DIALOG WYBORU PLIKU */
+   /* ENTRY FIELD FOR A PATH TO THE FILE */
+   Entry = gtk_entry_new();
+   gtk_entry_set_max_length(GTK_ENTRY(Entry), 50);
+   gtk_entry_set_text(GTK_ENTRY(Entry), "Wprowadz tekst");
+   gtk_editable_select_region(GTK_EDITABLE(Entry), 0, gtk_entry_get_text_length(GTK_ENTRY(Entry)));
+   g_signal_connect_swapped(Entry, "activate", G_CALLBACK(statsWindow), (gpointer) gtk_entry_get_text(GTK_ENTRY(Entry)));
+   g_signal_connect(Entry, "activate", G_CALLBACK(setEntry), (gpointer) Entry);
+   gtk_box_pack_start(GTK_BOX(fileSelectionBox), Entry, TRUE, TRUE, 0);
+   /* OPEN FILE SELECTION DIALOG */
    browseButton = gtk_button_new_with_label("...");
    g_signal_connect(browseButton, "clicked", G_CALLBACK(fileSelection), NULL);
    gtk_box_pack_start(GTK_BOX(fileSelectionBox), browseButton, TRUE, TRUE, 0);
@@ -357,16 +351,16 @@ void mainMenu () {
    buttonBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
    gtk_box_set_homogeneous(GTK_BOX(buttonBox), TRUE);
    gtk_box_pack_start(GTK_BOX(mainBox), buttonBox, TRUE, TRUE, 0);
-   /* PRZYCISK WYJSCIE */
+
    exitButton = gtk_button_new_with_label("Wyjscie");
    g_signal_connect(exitButton, "clicked", G_CALLBACK(gtk_main_quit), NULL);
    gtk_box_pack_start(GTK_BOX(buttonBox), exitButton, TRUE, TRUE, 1);
-   /* PRZYCISK POTWIERDZ */
+
    confirmButton = gtk_button_new_with_label("Potwierdz");
-   g_signal_connect_swapped(confirmButton, "clicked", G_CALLBACK(statsWindow), (gpointer) gtk_entry_get_text(GTK_ENTRY(entry)));
-   g_signal_connect(confirmButton, "clicked", G_CALLBACK(setEntry), (gpointer) entry);
+   g_signal_connect_swapped(confirmButton, "clicked", G_CALLBACK(statsWindow), (gpointer) gtk_entry_get_text(GTK_ENTRY(Entry)));
+   g_signal_connect(confirmButton, "clicked", G_CALLBACK(setEntry), (gpointer) Entry);
    gtk_box_pack_start(GTK_BOX(buttonBox), confirmButton, TRUE, TRUE, 1);
-   /* PRZYCISK POMOC */
+
    helpButton = gtk_button_new_with_label("Pomoc");
    g_signal_connect(helpButton, "clicked", G_CALLBACK(helpWindow), NULL);
    gtk_box_pack_end(GTK_BOX(mainBox), helpButton, TRUE, TRUE, 0);

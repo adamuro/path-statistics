@@ -6,27 +6,30 @@
 
 #include "common.h"
 
-double atofC (const char *str);
-double singleDistance (Pt p1, Pt p2);
+double atofC (const char *Str); // Standard atof didn't work
+double singleDistance (Pt p1, Pt p2); // Between 2 points
 double fullDistance ();
 double minHeight ();
 double maxHeight ();
 double heightDif ();
-void getDate (PtDate *date, int dateNum, char *dateStr);
-long long timeDifference (PtDate startDate, PtDate endDate);
-long long pathDuration ();
-double singleSpeed (int startPointIndex, int endPointIndex);
+void getDate (PtDate *Date, int dateNum, char *dateStr); // Read date from GPX format and save in the Date struct
+bool leapYear (int Year); // Is Year a leap year?
+int daysTillMonth (PtDate Date); // Number of days between 01.01 and first day of the month
+long long timeDifference (PtDate startDate, PtDate endDate); // Number of seconds between 2 dates
+long long PathDuration (); // In seconds
+double singleSpeed (int startPointIndex, int endPointIndex); // In km/h
 double averageSpeed ();
 double maxSpeed ();
 double minSpeed ();
+double averageTempo (); // In min/km
 double maxTempo ();
 double minTempo ();
-double averageTempo ();
-double convertToCartesianX (Pt point);
-double convertToCartesianY (Pt point);
-double minCartesianX (Pt *point, int pointsNum);
-double minCartesianY (Pt *point, int pointsNum);
-double cartesianDifX (Pt *point, int pointsNum);
-double cartesianDifY (Pt *point, int pointsNum);
+double convertToCartesianX (Pt Point); // Conversion from geographic to cartesian coordinates for the X axis
+double convertToCartesianY (Pt Point); // Conversion from geographic to cartesian coordinates for the Y axis
+void cartesianMinimums 
+	(double *minCartesianX, double *minCartesianY, Pt *Point, int pointsNum);
+void cartesianDiffs
+	(double minX, double minY, double *difX, double *difY,
+	Pt *Point, int pointsNum);
 
- #endif
+#endif

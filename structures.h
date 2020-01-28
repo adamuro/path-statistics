@@ -1,33 +1,28 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
-/*
- *  DATA
- */
+
+/* DATE */
 typedef struct PtDate {
     unsigned short day, month, year;
     unsigned short hour, minute, second;
 } PtDate;
-/*
- *  WSPÓŁRZĘDNE PUNKTU
- */
+/* GEOGRAPHIC COORDINATES */
 typedef struct Pt {
     double lat;
     double lon;
 } Pt;
-/*
- *  DATE O PUNKCIE
- */
+/* INFORMATIONS ABOUT A SINGLE POINT */
 typedef struct PtList {
 	int pointsNum;
-	Pt *point;
+	Pt *Point;
 
 	int dateNum;
-	PtDate *date;
+	PtDate *Date;
 
 	int hNum;
-	double *height;
+	double *Height;
 } PtList;
 
-PtList *path;
+PtList *Path;
 
 #endif

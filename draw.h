@@ -1,19 +1,13 @@
 #ifndef DRAW_H
 #define DRAW_H
 
-#ifndef MapWidth
-#define MapWidth 450
-#endif
-#ifndef MapHeight
-#define MapHeight 300
-#endif
+#define MapWidth 500
+#define MapHeight 350
 
 #include "common.h"
 
-void doDrawing (cairo_t *);
-
-void drawingAreaSetup (GtkWidget *win);
-
-gboolean onDrawEvent (GtkWidget *widget, cairo_t *cr, gpointer user_data);
+void doDrawing (cairo_t *drawingArea); // Draw a map of the path in the drawing area
+void drawingAreaSetup (GtkWidget *drawingArea); // Set up the drawing area
+gboolean onDrawEvent (GtkWidget *Widget, cairo_t *drawingArea, gpointer userData); // Connection between draw signal and actual function
 
 #endif

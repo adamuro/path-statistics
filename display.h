@@ -3,8 +3,12 @@
 
 #include "common.h"
 
+char* makeLabelName (char *type); // Create a string that contains information about a certain statistic
+void statsWindow (char *fileName); // Open a window with the path statistics
+void fileSelection (); // Open a file selection dialog
 void mainMenu ();
-
-void fileOpenError ();
+void helpWindow ();
+void fileOpenError (); // Message about error during file opening
+void setEntry (GtkWidget *Widget, GtkWidget *Entry); // Set focus on the entry field
 
 #endif
