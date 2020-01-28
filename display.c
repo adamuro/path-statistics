@@ -180,11 +180,11 @@ void statsWindow (char *fileName) {
       GtkWidget *difHText;
       GtkWidget *closeButton;
 
-      printf("%d %d\n", Path -> pointsNum, Path -> dateNum);
+      fileName = cutFileName(fileName);
 
       statsWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
       gtk_window_set_position(GTK_WINDOW(statsWindow), GTK_WIN_POS_CENTER);
-      gtk_window_set_title(GTK_WINDOW(statsWindow), "Statystyki");
+      gtk_window_set_title(GTK_WINDOW(statsWindow), fileName);
       gtk_window_set_default_size(GTK_WINDOW(statsWindow), 800, 400);
       gtk_container_set_border_width(GTK_CONTAINER(statsWindow), 10);
       gtk_window_set_resizable(GTK_WINDOW(statsWindow), FALSE);
@@ -246,7 +246,7 @@ void statsWindow (char *fileName) {
       drawingAreaSetup(drawingArea);
       g_signal_connect(G_OBJECT(drawingArea), "draw", G_CALLBACK(onDrawEvent), NULL); 
 
-      g_signal_connect(closeButton, "clicked", G_CALLBACK(gtk_window_close), statsWindow);
+      g_signal_connect_swapped(closeButton, "clicked", G_CALLBACK(gtk_widget_destroy), statsWindow);
 
       g_signal_connect(statsWindow, "destroy", G_CALLBACK(gtk_widget_destroy), statsWindow);
 
@@ -284,7 +284,7 @@ void helpWindow () {
    gtk_widget_set_margin_end(closeButton, 150);
    gtk_box_pack_start(GTK_BOX(mainBox), closeButton, FALSE, TRUE, 0);
 
-   g_signal_connect(closeButton, "clicked", G_CALLBACK(gtk_window_close), helpWindow);
+   g_signal_connect_swapped(closeButton, "clicked", G_CALLBACK(gtk_widget_destroy), helpWindow);
 
    g_signal_connect(helpWindow, "destroy", G_CALLBACK(gtk_widget_destroy), helpWindow);
 
@@ -342,7 +342,7 @@ void mainMenu () {
    gtk_box_pack_start(GTK_BOX(mainBox), fileSelectionBox, TRUE, TRUE, 0);
    /* ENTRY FIELD FOR A PATH TO THE FILE */
    Entry = gtk_entry_new();
-   gtk_entry_set_max_length(GTK_ENTRY(Entry), 50);
+   gtk_entry_set_max_length(GTK_ENTRY(Entry), 80);
    gtk_entry_set_text(GTK_ENTRY(Entry), "Sciezka do pliku");
    gtk_editable_select_region(GTK_EDITABLE(Entry), 0, gtk_entry_get_text_length(GTK_ENTRY(Entry)));
    g_signal_connect_swapped(Entry, "activate", G_CALLBACK(statsWindow), (gpointer) gtk_entry_get_text(GTK_ENTRY(Entry)));
@@ -359,6 +359,7 @@ void mainMenu () {
    gtk_box_pack_start(GTK_BOX(mainBox), buttonBox, TRUE, TRUE, 0);
 
    exitButton = gtk_button_new_with_label("Wyjscie");
+   g_signal_connect_swapped(exitButton, "clicked", G_CALLBACK(gtk_widget_destroy), mainMenu);
    g_signal_connect(exitButton, "clicked", G_CALLBACK(gtk_main_quit), NULL);
    gtk_box_pack_start(GTK_BOX(buttonBox), exitButton, TRUE, TRUE, 1);
 

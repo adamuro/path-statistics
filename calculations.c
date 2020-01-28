@@ -15,6 +15,15 @@ double atofC (const char *Str) {
 	return Number;
 }
 
+char* cutFileName(char *Source) {
+	static char fileName[100];
+	for(int i = 0 ; i < strlen(Source) ; i++) {
+		if(Source[i] == '/')
+			strncpy(fileName, Source + i + 1, strlen(Source) - i);
+	}
+	return fileName;
+}
+
 double singleDistance (Pt p1, Pt p2) {
     double Dist = 6371.0 * acos(sin(p1.lat / 180.0 * M_PI) * sin(p2.lat / 180.0 * M_PI) +
         cos(p1.lat / 180.0 * M_PI) * cos(p2.lat / 180.0 * M_PI) *

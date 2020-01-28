@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-void pathInit (); // Allocate memory for path and fill it with zeros
+void pathInit (); // Allocate memory for a new path and fill it with zeros
 void pathFree (); // Free the allocated mamory
 void startElement (void *Data, const char *Element, const char **Attribute); // Find geographic coordinates in the GPX file
 void endElement (void *Data, const char *Elelement);

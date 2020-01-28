@@ -7,6 +7,7 @@
 #include "common.h"
 
 double atofC (const char *Str); // Standard atof didn't work
+char* cutFileName(char *Source); // Cut the path to the file and leave only the actual file name
 double singleDistance (Pt p1, Pt p2); // Between 2 points
 double fullDistance ();
 double minHeight ();
