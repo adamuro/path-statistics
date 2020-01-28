@@ -26,10 +26,10 @@ double maxTempo ();
 double minTempo ();
 double convertToCartesianX (Pt Point); // Conversion from geographic to cartesian coordinates for the X axis
 double convertToCartesianY (Pt Point); // Conversion from geographic to cartesian coordinates for the Y axis
-void cartesianMinimums 
-	(double *minCartesianX, double *minCartesianY, Pt *Point, int pointsNum);
-void cartesianDiffs
+void cartesianMinimums
+	(double *minCartesianX, double *minCartesianY, Pt *Point, int pointsNum); // Find minimal x and y coordinates and assign them to pointers
+void cartesianDiffs 
 	(double minX, double minY, double *difX, double *difY,
-	Pt *Point, int pointsNum);
+	Pt *Point, int pointsNum); // Calculate the differences between maximal and minimal x and y coordinates and assign them to pointers
 
 #endif

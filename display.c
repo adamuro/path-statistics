@@ -1,6 +1,6 @@
 #include "display.h"
 
-void fileOpenError () {
+void fileError (char *errorCode) {
    GtkWidget *errorWindow;
    GtkWidget *mainBox;
    GtkWidget *errorMessage;
@@ -11,12 +11,17 @@ void fileOpenError () {
    gtk_window_set_default_size(GTK_WINDOW(errorWindow), 100, 60);
    gtk_window_set_position(GTK_WINDOW(errorWindow), GTK_WIN_POS_CENTER);
    gtk_window_set_resizable(GTK_WINDOW(errorWindow), FALSE);
+   //gtk_window_set_transient_for(GTK_WINDOW(errorWindow), GTK_WINDOW(mainMenu));
    gtk_container_set_border_width(GTK_CONTAINER(errorWindow), 10);
 
    mainBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
    gtk_container_add(GTK_CONTAINER(errorWindow), mainBox);
 
-   errorMessage = gtk_label_new("Nie znaleziono pliku!");
+   errorMessage = gtk_label_new("");
+   if(!strcmp(errorCode, "notFound"))
+      gtk_label_set_text(GTK_LABEL(errorMessage), "Nie znaleziono pliku!");
+   else if(!strcmp(errorCode, "reading"))
+      gtk_label_set_text(GTK_LABEL(errorMessage), "Blad podczas czytania pliku!");
    gtk_box_pack_start(GTK_BOX(mainBox), errorMessage, TRUE, TRUE, 0);
 
    okButton = gtk_button_new_with_label("Ok");
@@ -156,7 +161,7 @@ char* makeLabelName (char *type) {
 }
 
 void statsWindow (char *fileName) {
-   if(PathParse(fileName)) {
+   if(PathParse(fileName) && Path -> pointsNum == Path -> dateNum) {
       GtkWidget *statsWindow;
       GtkWidget *mainBox;
       GtkWidget *Separator;
@@ -191,7 +196,7 @@ void statsWindow (char *fileName) {
 
       Separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
       gtk_box_pack_start(GTK_BOX(mainBox), Separator, FALSE, TRUE, 0);
-
+      /* FIELD FOR THE MAP TO BE DRAWN */
       drawingArea = gtk_drawing_area_new();
       gtk_box_pack_start(GTK_BOX(mainBox), drawingArea, TRUE, TRUE, 0);
       /* DATE */
@@ -222,15 +227,16 @@ void statsWindow (char *fileName) {
       minTempoText = gtk_label_new(makeLabelName("minT"));
       gtk_box_pack_start(GTK_BOX(statsBox), minTempoText, TRUE, TRUE, 0);
       /* LOWEST LOCATED POINT */
-      minHText = gtk_label_new(makeLabelName("minH"));
-      gtk_box_pack_start(GTK_BOX(statsBox), minHText, TRUE, TRUE, 0);
-      /* HIGHEST LOCATED POINT */
-      maxHText = gtk_label_new(makeLabelName("maxH"));
-      gtk_box_pack_start(GTK_BOX(statsBox), maxHText, TRUE, TRUE, 0);
-      /* HEIGHT DIFFERENCE */
-      difHText = gtk_label_new(makeLabelName("difH"));
-      gtk_box_pack_start(GTK_BOX(statsBox), difHText, TRUE, TRUE, 0);
-
+      if(Path -> hNum > 0) {
+         minHText = gtk_label_new(makeLabelName("minH"));
+         gtk_box_pack_start(GTK_BOX(statsBox), minHText, TRUE, TRUE, 0);
+         /* HIGHEST LOCATED POINT */
+         maxHText = gtk_label_new(makeLabelName("maxH"));
+         gtk_box_pack_start(GTK_BOX(statsBox), maxHText, TRUE, TRUE, 0);
+         /* HEIGHT DIFFERENCE */
+         difHText = gtk_label_new(makeLabelName("difH"));
+         gtk_box_pack_start(GTK_BOX(statsBox), difHText, TRUE, TRUE, 0);
+      }
       closeButton = gtk_button_new_with_label("Zamknij");
       gtk_widget_set_margin_start(closeButton, 30);
       gtk_widget_set_margin_end(closeButton, 30);
@@ -247,12 +253,12 @@ void statsWindow (char *fileName) {
 
       gtk_widget_show_all(statsWindow);
    }
+   else if(Path -> pointsNum != Path -> dateNum)
+      fileError("reading");
    else
-      fileOpenError();
+      fileError("notFound");
 }
-/*
- *  OKNO POMOCY
- */
+
 void helpWindow () {
    GtkWidget *helpWindow;
    GtkWidget *mainBox;
@@ -268,7 +274,8 @@ void helpWindow () {
    mainBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
    gtk_container_add(GTK_CONTAINER(helpWindow), mainBox);
    /* HELP TEXT */
-   Help = gtk_label_new("POMOC");
+   Help = gtk_label_new("Wprowadz sciezke do pliku o rozszerzeniu .gpx\ndo pola tekstowego i kliknij \"potwierdz\"\nlub wybierz plik za pomoca przycisku \"...\".\nUWAGA: Plik musi zawierac informacje\n o wspolrzednych oraz datach.");
+   gtk_label_set_justify(GTK_LABEL(Help), GTK_JUSTIFY_CENTER);
    gtk_box_pack_start(GTK_BOX(mainBox), Help, TRUE, TRUE, 0);
 
    closeButton = gtk_button_new_with_label("Zamknij");
@@ -283,7 +290,7 @@ void helpWindow () {
    gtk_widget_show_all(helpWindow);
 }
 
-void setEntry (GtkWidget *Widget, GtkWidget *Entry) {
+void setEntry (GtkWidget *Entry) {
    gtk_editable_select_region(GTK_EDITABLE(Entry), 0, gtk_entry_get_text_length(GTK_ENTRY(Entry)));
    gtk_widget_grab_focus(Entry);
 }
@@ -306,9 +313,6 @@ void fileSelection () {
    gtk_widget_destroy(fileSelectionDialog);
 }
 
-/*
- *  MENU GŁÓWNE
- */
 void mainMenu () {
    GtkWidget *mainMenu;
    GtkWidget *mainBox;
@@ -358,7 +362,7 @@ void mainMenu () {
 
    confirmButton = gtk_button_new_with_label("Potwierdz");
    g_signal_connect_swapped(confirmButton, "clicked", G_CALLBACK(statsWindow), (gpointer) gtk_entry_get_text(GTK_ENTRY(Entry)));
-   g_signal_connect(confirmButton, "clicked", G_CALLBACK(setEntry), (gpointer) Entry);
+   g_signal_connect_swapped(confirmButton, "clicked", G_CALLBACK(setEntry), (gpointer) Entry);
    gtk_box_pack_start(GTK_BOX(buttonBox), confirmButton, TRUE, TRUE, 1);
 
    helpButton = gtk_button_new_with_label("Pomoc");
