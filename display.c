@@ -11,7 +11,6 @@ void fileError (char *errorCode) {
    gtk_window_set_default_size(GTK_WINDOW(errorWindow), 100, 60);
    gtk_window_set_position(GTK_WINDOW(errorWindow), GTK_WIN_POS_CENTER);
    gtk_window_set_resizable(GTK_WINDOW(errorWindow), FALSE);
-   //gtk_window_set_transient_for(GTK_WINDOW(errorWindow), GTK_WINDOW(mainMenu));
    gtk_container_set_border_width(GTK_CONTAINER(errorWindow), 10);
 
    mainBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
@@ -181,6 +180,8 @@ void statsWindow (char *fileName) {
       GtkWidget *difHText;
       GtkWidget *closeButton;
 
+      printf("%d %d\n", Path -> pointsNum, Path -> dateNum);
+
       statsWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
       gtk_window_set_position(GTK_WINDOW(statsWindow), GTK_WIN_POS_CENTER);
       gtk_window_set_title(GTK_WINDOW(statsWindow), "Statystyki");
@@ -342,14 +343,15 @@ void mainMenu () {
    /* ENTRY FIELD FOR A PATH TO THE FILE */
    Entry = gtk_entry_new();
    gtk_entry_set_max_length(GTK_ENTRY(Entry), 50);
-   gtk_entry_set_text(GTK_ENTRY(Entry), "Wprowadz tekst");
+   gtk_entry_set_text(GTK_ENTRY(Entry), "Sciezka do pliku");
    gtk_editable_select_region(GTK_EDITABLE(Entry), 0, gtk_entry_get_text_length(GTK_ENTRY(Entry)));
    g_signal_connect_swapped(Entry, "activate", G_CALLBACK(statsWindow), (gpointer) gtk_entry_get_text(GTK_ENTRY(Entry)));
-   g_signal_connect(Entry, "activate", G_CALLBACK(setEntry), (gpointer) Entry);
+   g_signal_connect_swapped(Entry, "activate", G_CALLBACK(setEntry), (gpointer) Entry);
    gtk_box_pack_start(GTK_BOX(fileSelectionBox), Entry, TRUE, TRUE, 0);
    /* OPEN FILE SELECTION DIALOG */
    browseButton = gtk_button_new_with_label("...");
    g_signal_connect(browseButton, "clicked", G_CALLBACK(fileSelection), NULL);
+   g_signal_connect_swapped(browseButton, "clicked", G_CALLBACK(setEntry), (gpointer) Entry);
    gtk_box_pack_start(GTK_BOX(fileSelectionBox), browseButton, TRUE, TRUE, 0);
 
    buttonBox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);

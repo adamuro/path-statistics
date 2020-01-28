@@ -54,12 +54,13 @@ void Handler(void *Data, const char *Object, int Length) {
 
 bool PathParse (const char *fileName) {
     FILE *fp;
+
+    pathInit();
     
     if((fp = fopen(fileName, "r")) == NULL) {
         return 0;
     }
 
-    pathInit();
     char *Buff = malloc(BUFF_SIZE);
 
     XML_Parser Parser = XML_ParserCreate(NULL);
