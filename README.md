@@ -14,4 +14,5 @@ sudo apt-get install -y expat
 sudo apt-get install libcairo2-dev
 
 Kompilacja: komenda 'make'
+
 Uruchomienie: './statystyki-trasy'
