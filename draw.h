@@ -1,7 +1,7 @@
 #ifndef DRAW_H
 #define DRAW_H
 
-#define MapWidth 500
+#define MapWidth 350
 #define MapHeight 350
 
 #include "common.h"

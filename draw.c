@@ -17,15 +17,17 @@ void doDrawing (cairo_t *drawingArea) {
    double difY;
    double minX;
    double minY;
+   double maxDiff;
 
    cartesianMinimums(&minX, &minY, Path -> Point, Path -> pointsNum);
    cartesianDiffs(minX, minY, &difX, &difY, Path -> Point, Path -> pointsNum);
+   maxDiff = (difX > difY) ? difX : difY;
    
    for (int i = 0 ; i < Path -> pointsNum - 1 ; i++) {
-      cairo_move_to(drawingArea, (convertToCartesianX(Path -> Point[i]) - minX) * (MapWidth / difX) + 10,
-         (convertToCartesianY(Path -> Point[i]) - minY) * (MapHeight / difY) + 10);
-      cairo_line_to(drawingArea, (convertToCartesianX(Path -> Point[i + 1]) - minX) * (MapWidth / difX) + 10,
-         (convertToCartesianY(Path -> Point[i + 1]) - minY) * (MapHeight / difY) + 10);
+      cairo_move_to(drawingArea, (convertToCartesianX(Path -> Point[i]) - minX) * (MapWidth / maxDiff) + 10,
+         (convertToCartesianY(Path -> Point[i]) - minY) * (MapHeight / maxDiff) + 10);
+      cairo_line_to(drawingArea, (convertToCartesianX(Path -> Point[i + 1]) - minX) * (MapWidth / maxDiff) + 10,
+         (convertToCartesianY(Path -> Point[i + 1]) - minY) * (MapHeight / maxDiff) + 10);
    }
    cairo_stroke(drawingArea);
 }

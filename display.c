@@ -185,7 +185,7 @@ void statsWindow (char *fileName) {
       statsWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
       gtk_window_set_position(GTK_WINDOW(statsWindow), GTK_WIN_POS_CENTER);
       gtk_window_set_title(GTK_WINDOW(statsWindow), fileName);
-      gtk_window_set_default_size(GTK_WINDOW(statsWindow), 800, 400);
+      gtk_window_set_default_size(GTK_WINDOW(statsWindow), 650, 400);
       gtk_container_set_border_width(GTK_CONTAINER(statsWindow), 10);
       gtk_window_set_resizable(GTK_WINDOW(statsWindow), FALSE);
 
