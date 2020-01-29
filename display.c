@@ -21,6 +21,8 @@ void fileError (char *errorCode) {
       gtk_label_set_text(GTK_LABEL(errorMessage), "Nie znaleziono pliku!");
    else if(!strcmp(errorCode, "reading"))
       gtk_label_set_text(GTK_LABEL(errorMessage), "Blad podczas czytania pliku!");
+   else if(!strcmp(errorCode, "noDates"))
+      gtk_label_set_text(GTK_LABEL(errorMessage), "Brak informacji o datach!");
    gtk_box_pack_start(GTK_BOX(mainBox), errorMessage, TRUE, TRUE, 0);
 
    okButton = gtk_button_new_with_label("Ok");
@@ -160,7 +162,7 @@ char* makeLabelName (char *type) {
 }
 
 void statsWindow (char *fileName) {
-   if(PathParse(fileName) && Path -> pointsNum == Path -> dateNum) {
+   if(PathParse(fileName) && Path -> pointsNum > 0) {
       GtkWidget *statsWindow;
       GtkWidget *mainBox;
       GtkWidget *Separator;
@@ -193,6 +195,7 @@ void statsWindow (char *fileName) {
       gtk_container_add(GTK_CONTAINER(statsWindow), mainBox);
 
       statsBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+      //gtk_box_set_homogeneous(GTK_BOX(statsBox), FALSE);
       gtk_box_pack_start(GTK_BOX(mainBox), statsBox, FALSE, TRUE, 0);
 
       Separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
@@ -200,48 +203,50 @@ void statsWindow (char *fileName) {
       /* FIELD FOR THE MAP TO BE DRAWN */
       drawingArea = gtk_drawing_area_new();
       gtk_box_pack_start(GTK_BOX(mainBox), drawingArea, TRUE, TRUE, 0);
-      /* DATE */
-      dateText = gtk_label_new(makeLabelName("date"));
-      gtk_box_pack_start(GTK_BOX(statsBox), dateText, TRUE, TRUE, 0);
-      /* PATH DURATION */
-      timeText = gtk_label_new(makeLabelName("time"));
-      gtk_box_pack_start(GTK_BOX(statsBox), timeText, TRUE, TRUE, 0);
       /* FULL DISTANCE */
       distanceText = gtk_label_new(makeLabelName("dist"));
-      gtk_box_pack_start(GTK_BOX(statsBox), distanceText, TRUE, TRUE, 0);
-      /* AVERAGE SPEED */
-      avgSpeedText = gtk_label_new(makeLabelName("avgV"));
-      gtk_box_pack_start(GTK_BOX(statsBox), avgSpeedText, TRUE, TRUE, 0);
-      /* HIGHEST SPEED */
-      maxSpeedText = gtk_label_new(makeLabelName("maxV"));
-      gtk_box_pack_start(GTK_BOX(statsBox), maxSpeedText, TRUE, TRUE, 0);
-      /* LOWEST SPEED */
-      minSpeedText = gtk_label_new(makeLabelName("minV"));
-      gtk_box_pack_start(GTK_BOX(statsBox), minSpeedText, TRUE, TRUE, 0);
-      /* AVERAGE TEMPO */
-      avgTempoText = gtk_label_new(makeLabelName("avgT"));
-      gtk_box_pack_start(GTK_BOX(statsBox), avgTempoText, TRUE, TRUE, 0);
-      /* HIGHEST TEMPO */
-      maxTempoText = gtk_label_new(makeLabelName("maxT"));
-      gtk_box_pack_start(GTK_BOX(statsBox), maxTempoText, TRUE, TRUE, 0);
-      /* LOWEST TEMPO */
-      minTempoText = gtk_label_new(makeLabelName("minT"));
-      gtk_box_pack_start(GTK_BOX(statsBox), minTempoText, TRUE, TRUE, 0);
-      /* LOWEST LOCATED POINT */
+      gtk_box_pack_start(GTK_BOX(statsBox), distanceText, FALSE, TRUE, 0);
+      if(Path -> dateNum > 0) {
+         /* DATE */
+         dateText = gtk_label_new(makeLabelName("date"));
+         gtk_box_pack_start(GTK_BOX(statsBox), dateText, TRUE, TRUE, 0);
+         /* PATH DURATION */
+         timeText = gtk_label_new(makeLabelName("time"));
+         gtk_box_pack_start(GTK_BOX(statsBox), timeText, TRUE, TRUE, 0);
+         /* AVERAGE SPEED */
+         avgSpeedText = gtk_label_new(makeLabelName("avgV"));
+         gtk_box_pack_start(GTK_BOX(statsBox), avgSpeedText, TRUE, TRUE, 0);
+         /* HIGHEST SPEED */
+         maxSpeedText = gtk_label_new(makeLabelName("maxV"));
+         gtk_box_pack_start(GTK_BOX(statsBox), maxSpeedText, TRUE, TRUE, 0);
+         /* LOWEST SPEED */
+         minSpeedText = gtk_label_new(makeLabelName("minV"));
+         gtk_box_pack_start(GTK_BOX(statsBox), minSpeedText, TRUE, TRUE, 0);
+         /* AVERAGE TEMPO */
+         avgTempoText = gtk_label_new(makeLabelName("avgT"));
+         gtk_box_pack_start(GTK_BOX(statsBox), avgTempoText, TRUE, TRUE, 0);
+         /* HIGHEST TEMPO */
+         maxTempoText = gtk_label_new(makeLabelName("maxT"));
+         gtk_box_pack_start(GTK_BOX(statsBox), maxTempoText, TRUE, TRUE, 0);
+         /* LOWEST TEMPO */
+         minTempoText = gtk_label_new(makeLabelName("minT"));
+         gtk_box_pack_start(GTK_BOX(statsBox), minTempoText, TRUE, TRUE, 0);
+      }
       if(Path -> hNum > 0) {
+         /* LOWEST LOCATED POINT */
          minHText = gtk_label_new(makeLabelName("minH"));
-         gtk_box_pack_start(GTK_BOX(statsBox), minHText, TRUE, TRUE, 0);
+         gtk_box_pack_start(GTK_BOX(statsBox), minHText, FALSE, TRUE, 0);
          /* HIGHEST LOCATED POINT */
          maxHText = gtk_label_new(makeLabelName("maxH"));
-         gtk_box_pack_start(GTK_BOX(statsBox), maxHText, TRUE, TRUE, 0);
+         gtk_box_pack_start(GTK_BOX(statsBox), maxHText, FALSE, TRUE, 0);
          /* HEIGHT DIFFERENCE */
          difHText = gtk_label_new(makeLabelName("difH"));
-         gtk_box_pack_start(GTK_BOX(statsBox), difHText, TRUE, TRUE, 0);
+         gtk_box_pack_start(GTK_BOX(statsBox), difHText, FALSE, TRUE, 0);
       }
       closeButton = gtk_button_new_with_label("Zamknij");
       gtk_widget_set_margin_start(closeButton, 30);
       gtk_widget_set_margin_end(closeButton, 30);
-      gtk_box_pack_start(GTK_BOX(statsBox), closeButton, TRUE, TRUE, 0);
+      gtk_box_pack_end(GTK_BOX(statsBox), closeButton, FALSE, FALSE, 0);
 
       drawingAreaSetup(drawingArea);
       g_signal_connect(G_OBJECT(drawingArea), "draw", G_CALLBACK(onDrawEvent), NULL); 
@@ -254,10 +259,12 @@ void statsWindow (char *fileName) {
 
       gtk_widget_show_all(statsWindow);
    }
-   else if(Path -> pointsNum != Path -> dateNum)
+   else if(Path -> pointsNum == 0)
       fileError("reading");
    else
       fileError("notFound");
+   if(Path -> dateNum == 0)
+      fileError("noDates");
 }
 
 void helpWindow () {

@@ -163,11 +163,11 @@ double averageTempo () {
 	return 1 / averageSpeed() * 60;
 }
 
-double convertToCartesianX (Pt Point) {
+double convertToCartesianY (Pt Point) {
 	return R * cos(Point.lat * M_PI * 2.0 / 360.0) * cos(Point.lon * M_PI * 2.0 / 360.0);
 }
 
-double convertToCartesianY (Pt Point) {
+double convertToCartesianX (Pt Point) {
 	return R * cos(Point.lat * M_PI * 2.0 / 360.0) * sin(Point.lon * M_PI * 2.0 / 360.0);
 }
 
