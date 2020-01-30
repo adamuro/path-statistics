@@ -17,6 +17,7 @@ double atofC (const char *Str) {
 
 char* cutFileName(char *Source) {
 	static char fileName[100];
+	strcpy(fileName, Source);
 	for(int i = 0 ; i < strlen(Source) ; i++) {
 		if(Source[i] == '/')
 			strncpy(fileName, Source + i + 1, strlen(Source) - i);
